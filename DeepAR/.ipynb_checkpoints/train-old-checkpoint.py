@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 logger = logging.getLogger('DeepAR.Train')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default='amazon_stock_processed', help='Name of the dataset')
+parser.add_argument('--dataset', default='elect', help='Name of the dataset')
 parser.add_argument('--data-folder', default='data', help='Parent dir of the dataset')
 parser.add_argument('--model-name', default='base_model', help='Directory containing params.json')
 parser.add_argument('--relative-metrics', action='store_true', help='Whether to normalize the metrics by label scales')
@@ -167,8 +167,6 @@ if __name__ == '__main__':
     # Load the parameters from json file
     args = parser.parse_args()
     model_dir = os.path.join('experiments', args.model_name)
-
-    
     json_path = os.path.join(model_dir, 'params.json')
     data_dir = os.path.join(args.data_folder, args.dataset)
     assert os.path.isfile(json_path), f'No json configuration file found at {json_path}'

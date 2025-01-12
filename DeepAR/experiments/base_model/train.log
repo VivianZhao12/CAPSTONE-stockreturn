@@ -1,0 +1,138 @@
+[15:24:01] DeepAR.Train: Loading the datasets...
+[16:32:56] DeepAR.Train: Loading the datasets...
+[16:37:38] DeepAR.Train: Loading the datasets...
+[16:37:38] DeepAR.Data: train_len: 42
+[16:37:38] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:37:38] DeepAR.Data: test_len: 21
+[16:37:38] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:37:38] DeepAR.Data: weights: tensor([3.5593e-07, 3.4008e-07, 3.4206e-07, 3.1429e-07, 2.4798e-07, 2.4255e-07,
+        3.5593e-07, 3.4008e-07, 3.4206e-07, 3.1429e-07, 2.4798e-07, 2.4255e-07,
+        3.6005e-07, 3.4639e-07, 3.4502e-07, 3.2211e-07, 2.5128e-07, 2.4737e-07,
+        3.5155e-07, 3.3580e-07, 3.3465e-07, 3.0904e-07, 2.4138e-07, 2.3709e-07,
+        3.5652e-07, 3.4085e-07, 3.3821e-07, 3.1754e-07, 2.4575e-07, 2.4232e-07,
+        1.2828e-01, 1.5344e-01, 1.5128e-01, 1.9348e-01, 2.2825e-01, 1.4525e-01,
+        2.1469e-09, 2.1459e-09, 2.1799e-09, 2.1130e-09, 2.1817e-09, 2.1446e-09],
+       dtype=torch.float64)
+[16:37:38] DeepAR.Data: num samples: 42
+[16:37:38] DeepAR.Train: Loading complete.
+[16:37:38] DeepAR.Train: Model: 
+Net(
+  (embedding): Embedding(370, 20)
+  (lstm): LSTM(25, 40, num_layers=3, dropout=0.1)
+  (relu): ReLU()
+  (distribution_mu): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_presigma): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_sigma): Softplus(beta=1, threshold=20)
+)
+[16:37:39] DeepAR.Train: Starting training for 20 epoch(s)
+[16:37:39] DeepAR.Train: begin training and evaluation
+[16:37:39] DeepAR.Train: Epoch 1/20
+[16:44:31] DeepAR.Train: Loading the datasets...
+[16:44:47] DeepAR.Train: Loading the datasets...
+[16:44:47] DeepAR.Data: train_len: 42
+[16:44:47] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:44:47] DeepAR.Data: test_len: 21
+[16:44:47] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:44:47] DeepAR.Data: weights: tensor([3.5593e-07, 3.4008e-07, 3.4206e-07, 3.1429e-07, 2.4798e-07, 2.4255e-07,
+        3.5593e-07, 3.4008e-07, 3.4206e-07, 3.1429e-07, 2.4798e-07, 2.4255e-07,
+        3.6005e-07, 3.4639e-07, 3.4502e-07, 3.2211e-07, 2.5128e-07, 2.4737e-07,
+        3.5155e-07, 3.3580e-07, 3.3465e-07, 3.0904e-07, 2.4138e-07, 2.3709e-07,
+        3.5652e-07, 3.4085e-07, 3.3821e-07, 3.1754e-07, 2.4575e-07, 2.4232e-07,
+        1.2828e-01, 1.5344e-01, 1.5128e-01, 1.9348e-01, 2.2825e-01, 1.4525e-01,
+        2.1469e-09, 2.1459e-09, 2.1799e-09, 2.1130e-09, 2.1817e-09, 2.1446e-09],
+       dtype=torch.float64)
+[16:44:47] DeepAR.Data: num samples: 42
+[16:44:47] DeepAR.Train: Loading complete.
+[16:44:47] DeepAR.Train: Model: 
+Net(
+  (embedding): Embedding(370, 20)
+  (lstm): LSTM(25, 40, num_layers=3, dropout=0.1)
+  (relu): ReLU()
+  (distribution_mu): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_presigma): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_sigma): Softplus(beta=1, threshold=20)
+)
+[16:44:48] DeepAR.Train: Starting training for 20 epoch(s)
+[16:44:48] DeepAR.Train: begin training and evaluation
+[16:44:48] DeepAR.Train: Epoch 1/20
+[16:49:34] DeepAR.Train: Loading the datasets...
+[16:49:34] DeepAR.Data: train_len: 42
+[16:49:34] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:49:34] DeepAR.Data: test_len: 21
+[16:49:34] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:49:34] DeepAR.Data: weights: tensor([3.5593e-07, 3.4008e-07, 3.4206e-07, 3.1429e-07, 2.4798e-07, 2.4255e-07,
+        3.5593e-07, 3.4008e-07, 3.4206e-07, 3.1429e-07, 2.4798e-07, 2.4255e-07,
+        3.6005e-07, 3.4639e-07, 3.4502e-07, 3.2211e-07, 2.5128e-07, 2.4737e-07,
+        3.5155e-07, 3.3580e-07, 3.3465e-07, 3.0904e-07, 2.4138e-07, 2.3709e-07,
+        3.5652e-07, 3.4085e-07, 3.3821e-07, 3.1754e-07, 2.4575e-07, 2.4232e-07,
+        1.2828e-01, 1.5344e-01, 1.5128e-01, 1.9348e-01, 2.2825e-01, 1.4525e-01,
+        2.1469e-09, 2.1459e-09, 2.1799e-09, 2.1130e-09, 2.1817e-09, 2.1446e-09],
+       dtype=torch.float64)
+[16:49:34] DeepAR.Data: num samples: 42
+[16:49:34] DeepAR.Train: Loading complete.
+[16:49:34] DeepAR.Train: Model: 
+Net(
+  (embedding): Embedding(370, 20)
+  (lstm): LSTM(25, 40, num_layers=3, dropout=0.1)
+  (relu): ReLU()
+  (distribution_mu): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_presigma): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_sigma): Softplus(beta=1, threshold=20)
+)
+[16:49:34] DeepAR.Train: Starting training for 20 epoch(s)
+[16:49:34] DeepAR.Train: begin training and evaluation
+[16:49:34] DeepAR.Train: Epoch 1/20
+[16:50:20] DeepAR.Train: Loading the datasets...
+[16:50:20] DeepAR.Data: train_len: 42
+[16:50:20] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:50:20] DeepAR.Data: test_len: 21
+[16:50:20] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:50:20] DeepAR.Data: weights: tensor([3.5593e-07, 3.4008e-07, 3.4206e-07, 3.1429e-07, 2.4798e-07, 2.4255e-07,
+        3.5593e-07, 3.4008e-07, 3.4206e-07, 3.1429e-07, 2.4798e-07, 2.4255e-07,
+        3.6005e-07, 3.4639e-07, 3.4502e-07, 3.2211e-07, 2.5128e-07, 2.4737e-07,
+        3.5155e-07, 3.3580e-07, 3.3465e-07, 3.0904e-07, 2.4138e-07, 2.3709e-07,
+        3.5652e-07, 3.4085e-07, 3.3821e-07, 3.1754e-07, 2.4575e-07, 2.4232e-07,
+        1.2828e-01, 1.5344e-01, 1.5128e-01, 1.9348e-01, 2.2825e-01, 1.4525e-01,
+        2.1469e-09, 2.1459e-09, 2.1799e-09, 2.1130e-09, 2.1817e-09, 2.1446e-09],
+       dtype=torch.float64)
+[16:50:20] DeepAR.Data: num samples: 42
+[16:50:20] DeepAR.Train: Loading complete.
+[16:50:20] DeepAR.Train: Model: 
+Net(
+  (embedding): Embedding(370, 20)
+  (lstm): LSTM(25, 40, num_layers=3, dropout=0.1)
+  (relu): ReLU()
+  (distribution_mu): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_presigma): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_sigma): Softplus(beta=1, threshold=20)
+)
+[16:50:20] DeepAR.Train: Starting training for 20 epoch(s)
+[16:50:20] DeepAR.Train: begin training and evaluation
+[16:50:20] DeepAR.Train: Epoch 1/20
+[16:50:47] DeepAR.Train: Loading the datasets...
+[16:50:47] DeepAR.Data: train_len: 42
+[16:50:47] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:50:47] DeepAR.Data: test_len: 21
+[16:50:47] DeepAR.Data: building datasets from data/amazon_stock_processed...
+[16:50:47] DeepAR.Data: weights: tensor([3.5209e-07, 3.3569e-07, 3.4676e-07, 2.9363e-07, 2.5844e-07, 2.4197e-07,
+        3.5209e-07, 3.3569e-07, 3.4676e-07, 2.9363e-07, 2.5844e-07, 2.4197e-07,
+        3.5658e-07, 3.4149e-07, 3.4855e-07, 3.0144e-07, 2.6244e-07, 2.4527e-07,
+        3.4783e-07, 3.3114e-07, 3.3916e-07, 2.8832e-07, 2.5317e-07, 2.3598e-07,
+        3.5320e-07, 3.3639e-07, 3.4168e-07, 2.9754e-07, 2.5628e-07, 2.3961e-07,
+        1.2992e-01, 1.4416e-01, 1.4481e-01, 2.2814e-01, 2.2262e-01, 1.3034e-01,
+        2.1185e-09, 2.1184e-09, 2.1590e-09, 2.0788e-09, 2.1570e-09, 2.1351e-09],
+       dtype=torch.float64)
+[16:50:47] DeepAR.Data: num samples: 42
+[16:50:47] DeepAR.Train: Loading complete.
+[16:50:47] DeepAR.Train: Model: 
+Net(
+  (embedding): Embedding(370, 20)
+  (lstm): LSTM(25, 40, num_layers=3, dropout=0.1)
+  (relu): ReLU()
+  (distribution_mu): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_presigma): Linear(in_features=120, out_features=1, bias=True)
+  (distribution_sigma): Softplus(beta=1, threshold=20)
+)
+[16:50:47] DeepAR.Train: Starting training for 20 epoch(s)
+[16:50:47] DeepAR.Train: begin training and evaluation
+[16:50:47] DeepAR.Train: Epoch 1/20
