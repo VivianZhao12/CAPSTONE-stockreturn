@@ -14,5 +14,5 @@
     "embedding_dim": 20,
     "sample_times": 200,
     "lstm_dropout": 0.1,
-    "predict_batch": 256
+    "predict_batch": 16
 }
