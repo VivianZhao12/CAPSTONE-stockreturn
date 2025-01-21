@@ -1,19 +1,19 @@
 {
-    "learning_rate": 0.0005,
+    "learning_rate": 1e-3,
     "batch_size": 32,
     "lstm_layers": 2,
     "num_epochs": 10,
     "train_window": 30,
     "test_window": 30,
-    "predict_start": 5,
-    "test_predict_start": 5,
-    "predict_steps": 25,
+    "predict_start": 15,
+    "test_predict_start": 15,
+    "predict_steps": 15,
     "num_class": 251, 
-    "cov_dim": 13,
+    "cov_dim": 3,
     "lstm_hidden_dim": 64,
-    "embedding_dim": 32,
+    "embedding_dim": 20,
     "sample_times": 100,
-    "lstm_dropout": 0.3,
+    "lstm_dropout": 0.2,
     "predict_batch": 32
 }
 

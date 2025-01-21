@@ -55,11 +55,13 @@ def train(model: nn.Module,
     # train_batch ([batch_size, train_window, 1+cov_dim]): z_{0:T-1} + x_{1:T}, note that z_0 = 0;
     # idx ([batch_size]): one integer denoting the time series id;
     # labels_batch ([batch_size, train_window]): z_{1:T}.
+    
     for i, (train_batch, idx, labels_batch) in enumerate(tqdm(train_loader)):
         optimizer.zero_grad()
         batch_size = train_batch.shape[0]
 
         train_batch = train_batch.permute(1, 0, 2).to(torch.float32).to(params.device)  # not scaled
+        
         labels_batch = labels_batch.permute(1, 0).to(torch.float32).to(params.device)  # not scaled
         idx = idx.unsqueeze(0).to(params.device)
 
@@ -207,6 +209,12 @@ if __name__ == '__main__':
     sampler = WeightedSampler(data_dir, args.dataset) # Use weighted sampler instead of random sampler
     train_loader = DataLoader(train_set, batch_size=params.batch_size, sampler=sampler, num_workers=4)
     test_loader = DataLoader(test_set, batch_size=params.predict_batch, sampler=RandomSampler(test_set), num_workers=4)
+
+    # debug here before training start
+    print("Number of training batches:", len(train_loader))
+    print("Number of test batches:", len(test_loader))
+    print("Training set size:", len(train_set))
+    print("Test set size:", len(test_set))
     logger.info('Loading complete.')
 
     logger.info(f'Model: \n{str(model)}')

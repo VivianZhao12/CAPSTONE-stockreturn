@@ -129,6 +129,15 @@ def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
 
 # if relative is set to True, metrics are not normalized by the scale of labels
 def accuracy_ND(mu: torch.Tensor, labels: torch.Tensor, relative = False):
+    # debug start here
+    print("mu shape:", mu.shape)
+    print("labels shape:", labels.shape)
+    # Ensure labels matches mu's sequence length
+    seq_len = mu.shape[1]
+    labels = labels[:, :seq_len]
+    print("adjusted labels shape:", labels.shape)
+    # debug stop here
+    
     zero_index = (labels != 0)
     if relative:
         diff = torch.mean(torch.abs(mu[zero_index] - labels[zero_index])).item()
