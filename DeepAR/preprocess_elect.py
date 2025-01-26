@@ -97,23 +97,44 @@ def gen_covariates(times, price_data, num_covariates):
     covariates[:, 2] = stats.zscore([t.month for t in times])  # month
     
     # 2. Price-based features
-    covariates[:, 3] = stats.zscore(price_data['Open'].values)
-    covariates[:, 4] = stats.zscore(price_data['Close'].values)
-    covariates[:, 5] = stats.zscore(price_data['High'].values)
-    covariates[:, 6] = stats.zscore(price_data['Low'].values)
-    covariates[:, 7] = stats.zscore(price_data['Volume'].values)
-    
+    covariates[:, 3] = stats.zscore(price_data['Open'].shift(5).values)
+    covariates[:, 4] = stats.zscore(price_data['Close'].shift(5).values)
+    covariates[:, 5] = stats.zscore(price_data['High'].shift(5).values)
+    covariates[:, 6] = stats.zscore(price_data['Low'].shift(5).values)
+    covariates[:, 7] = stats.zscore(price_data['Volume'].shift(5).values)
+
     # 3. Technical indicators
     # Volatility (High-Low spread)
-    covariates[:, 8] = stats.zscore((price_data['High'] - price_data['Low']) / price_data['Close'])
+    covariates[:, 8] = stats.zscore((price_data['High'].shift(5) - price_data['Low'].shift(5)) / price_data['Close'].shift(5))
     
     # Trading value
-    covariates[:, 9] = stats.zscore(price_data['Volume'] * price_data['Close'])
+    covariates[:, 9] = stats.zscore(price_data['Volume'].shift(5) * price_data['Close'].shift(5))
     
     # Simple moving averages (5, 10, 20 days)
-    covariates[:, 10] = stats.zscore(price_data['Close'].rolling(window=5).mean())
-    covariates[:, 11] = stats.zscore(price_data['Close'].rolling(window=10).mean())
-    covariates[:, 12] = stats.zscore(price_data['Close'].rolling(window=20).mean())
+    covariates[:, 10] = stats.zscore(price_data['Close'].shift(5).rolling(window=5).mean())
+    covariates[:, 11] = stats.zscore(price_data['Close'].shift(5).rolling(window=10).mean())
+    covariates[:, 12] = stats.zscore(price_data['Close'].shift(5).rolling(window=20).mean())
+
+    # intraday return
+    covariates[:, 13] = stats.zscore((price_data['Close'].shift(5) - price_data['Open'].shift(5)) / price_data['Open'].shift(5))
+
+    # RSI (with 14 days time window)
+    prices = price_data['Close'].values
+    returns = np.diff(prices, prepend=prices[0])
+    gains = np.maximum(returns, 0)
+    losses = -np.minimum(returns, 0)
+    avg_gains = pd.Series(gains).rolling(window=14).mean()
+    avg_losses = pd.Series(losses).rolling(window=14).mean()
+    rs = avg_gains / avg_losses
+    rsi = 100 - (100 / (1 + rs))
+    covariates[:, 14] = stats.zscore(rsi.shift(5))
+
+    # MACD
+    exp1 = price_data['Close'].ewm(span=12, adjust=False).mean()
+    exp2 = price_data['Close'].ewm(span=26, adjust=False).mean()
+    macd = exp1 - exp2
+    signal = macd.ewm(span=9, adjust=False).mean()
+    covariates[:, 15] = stats.zscore(macd.shift(5))
     
     # Fill NaN values with 0
     covariates = np.nan_to_num(covariates)
@@ -130,17 +151,17 @@ def visualize(data, week_start):
 if __name__ == '__main__':
     # Configuration
     save_path = ''
-    name = 'amazon_stock.csv'
-    save_name = 'amazon_stock_processed'
+    name = 'cvs_stock.csv'
+    save_name = 'cvs_stock_processed'
     window_size = 30    # Size of each data window
     stride_size = 5    # How far to move the window each time
-    num_covariates = 13  # Number of features (3 time + 5 OHLCV + 5 technical)
-    train_start = '2022-01-01'
-    train_end = '2022-08-31'
-    test_start = '2022-08-25'
-    test_end = '2022-12-30'
-    pred_days = 25       # Prediction horizon
-    given_days = 5      # Historical data window
+    num_covariates = 16  # Number of features (3 time + 5 OHLCV + 6 technical)
+    train_start = '2019-12-03'
+    train_end = '2023-09-30'
+    test_start = '2023-09-25'
+    test_end = '2025-01-10'
+    pred_days = 5       # Prediction horizon
+    given_days = 25      # Historical data window
 
     # Create save directory
     save_path = os.path.join('data', save_name)
