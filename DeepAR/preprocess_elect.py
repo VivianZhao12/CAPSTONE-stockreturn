@@ -78,7 +78,7 @@ def prep_data(data, covariates, data_start, train=True):
     np.save(prefix+'data_'+save_name, x_input)
     np.save(prefix+'v_'+save_name, v_input)
     np.save(prefix+'label_'+save_name, label)
-
+    
 def gen_covariates(times, price_data, num_covariates):
     """
     Creates additional features including technical indicators
@@ -92,49 +92,26 @@ def gen_covariates(times, price_data, num_covariates):
     covariates = np.zeros((len(times), num_covariates))
     
     # 1. Time-based features
-    covariates[:, 0] = stats.zscore(np.arange(len(times)))  # age
-    covariates[:, 1] = stats.zscore([t.weekday() for t in times])  # weekday
-    covariates[:, 2] = stats.zscore([t.month for t in times])  # month
+    covariates[:, 0] = stats.zscore([t.weekday() for t in times])  # weekday
+    covariates[:, 1] = stats.zscore([t.month for t in times])  # month
     
     # 2. Price-based features
-    covariates[:, 3] = stats.zscore(price_data['Open'].shift(5).values)
-    covariates[:, 4] = stats.zscore(price_data['Close'].shift(5).values)
-    covariates[:, 5] = stats.zscore(price_data['High'].shift(5).values)
-    covariates[:, 6] = stats.zscore(price_data['Low'].shift(5).values)
-    covariates[:, 7] = stats.zscore(price_data['Volume'].shift(5).values)
+    covariates[:, 2] = stats.zscore(price_data['Close'].shift(5).values)
+    covariates[:, 3] = stats.zscore(price_data['Volume'].shift(5).values)
 
     # 3. Technical indicators
-    # Volatility (High-Low spread)
-    covariates[:, 8] = stats.zscore((price_data['High'].shift(5) - price_data['Low'].shift(5)) / price_data['Close'].shift(5))
-    
-    # Trading value
-    covariates[:, 9] = stats.zscore(price_data['Volume'].shift(5) * price_data['Close'].shift(5))
-    
-    # Simple moving averages (5, 10, 20 days)
-    covariates[:, 10] = stats.zscore(price_data['Close'].shift(5).rolling(window=5).mean())
-    covariates[:, 11] = stats.zscore(price_data['Close'].shift(5).rolling(window=10).mean())
-    covariates[:, 12] = stats.zscore(price_data['Close'].shift(5).rolling(window=20).mean())
-
     # intraday return
-    covariates[:, 13] = stats.zscore((price_data['Close'].shift(5) - price_data['Open'].shift(5)) / price_data['Open'].shift(5))
+    covariates[:, 4] = stats.zscore((price_data['Close'].shift(5) - price_data['Open'].shift(5)) / price_data['Open'].shift(5))
 
-    # RSI (with 14 days time window)
-    prices = price_data['Close'].values
-    returns = np.diff(prices, prepend=prices[0])
-    gains = np.maximum(returns, 0)
-    losses = -np.minimum(returns, 0)
-    avg_gains = pd.Series(gains).rolling(window=14).mean()
-    avg_losses = pd.Series(losses).rolling(window=14).mean()
-    rs = avg_gains / avg_losses
-    rsi = 100 - (100 / (1 + rs))
-    covariates[:, 14] = stats.zscore(rsi.shift(5))
+    # Simple moving averages (10 days)
+    covariates[:, 5] = stats.zscore(price_data['Close'].shift(5).rolling(window=10).mean())
 
     # MACD
     exp1 = price_data['Close'].ewm(span=12, adjust=False).mean()
     exp2 = price_data['Close'].ewm(span=26, adjust=False).mean()
     macd = exp1 - exp2
     signal = macd.ewm(span=9, adjust=False).mean()
-    covariates[:, 15] = stats.zscore(macd.shift(5))
+    covariates[:, 6] = stats.zscore(macd.shift(5))
     
     # Fill NaN values with 0
     covariates = np.nan_to_num(covariates)
@@ -155,7 +132,7 @@ if __name__ == '__main__':
     save_name = 'cvs_stock_processed'
     window_size = 30    # Size of each data window
     stride_size = 5    # How far to move the window each time
-    num_covariates = 16  # Number of features (3 time + 5 OHLCV + 6 technical)
+    num_covariates = 7  # Number of features (2 time + 2 OHLCV + 3 technical)
     train_start = '2019-12-03'
     train_end = '2023-09-30'
     test_start = '2023-09-25'
@@ -169,7 +146,8 @@ if __name__ == '__main__':
         os.makedirs(save_path)
 
     # Load and prepare data
-    csv_path = os.path.join('https://raw.githubusercontent.com/VivianZhao12/CAPSTONE-stockreturn/refs/heads/master/Data/', name)
+    # csv_path = os.path.join('https://raw.githubusercontent.com/VivianZhao12/CAPSTONE-stockreturn/refs/heads/master/Data/', name)
+    csv_path = '../Data/cvs_stock.csv'
     data_frame = pd.read_csv(csv_path, parse_dates=True)
     
     # Process date column
@@ -185,7 +163,8 @@ if __name__ == '__main__':
     data_frame.fillna(0, inplace=True)  # Fill remaining with 0
     
     # Generate features
-    price_data = data_frame[['Open', 'Close', 'High', 'Low', 'Volume']]
+    # pre-select features using PCMCI
+    price_data = data_frame[['Open', 'Close', 'Volume']]
     covariates = gen_covariates(data_frame[train_start:test_end].index, price_data, num_covariates)
 
     # Split data
