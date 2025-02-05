@@ -79,7 +79,8 @@ def train(model: nn.Module,
 
         loss.backward()
         optimizer.step()
-        loss = loss.item() / params.train_window  # loss per timestep
+        loss = loss.item()
+        # loss = loss.item() / params.train_window  # loss per timestep
         loss_epoch[i] = loss
         if i % 1000 == 0:
             test_metrics = evaluate(model, loss_fn, test_loader, params, epoch, sample=args.sampling)

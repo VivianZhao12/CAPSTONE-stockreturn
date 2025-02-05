@@ -96,22 +96,29 @@ def gen_covariates(times, price_data, num_covariates):
     covariates[:, 1] = stats.zscore([t.month for t in times])  # month
     
     # 2. Price-based features
+    # Close price has significant relationships with returns and other variables
+    # Volume shows relationships with volatility and trading value
     covariates[:, 2] = stats.zscore(price_data['Close'].shift(5).values)
     covariates[:, 3] = stats.zscore(price_data['Volume'].shift(5).values)
 
     # 3. Technical indicators
-    # intraday return
-    covariates[:, 4] = stats.zscore((price_data['Close'].shift(5) - price_data['Open'].shift(5)) / price_data['Open'].shift(5))
+    # Intraday return (significant relationship with returns)
+    intraday_return = (price_data['Close'] - price_data['Open']) / price_data['Open']
+    covariates[:, 4] = stats.zscore(intraday_return.shift(5).values)
 
-    # Simple moving averages (10 days)
-    covariates[:, 5] = stats.zscore(price_data['Close'].shift(5).rolling(window=10).mean())
+    # MA5 (significant relationship with price dynamics)
+    ma5 = price_data['Close'].rolling(window=5).mean()
+    covariates[:, 5] = stats.zscore((price_data['Close'] - ma5).values)
 
-    # MACD
+    # MACD (strong contemporaneous and lagged relationships with returns)
     exp1 = price_data['Close'].ewm(span=12, adjust=False).mean()
     exp2 = price_data['Close'].ewm(span=26, adjust=False).mean()
     macd = exp1 - exp2
-    signal = macd.ewm(span=9, adjust=False).mean()
-    covariates[:, 6] = stats.zscore(macd.shift(5))
+    covariates[:, 6] = stats.zscore(macd.shift(2).values)  # lag-2 MACD (significant)
+
+    # Volatility (significant relationships in the system)
+    volatility = (price_data['High'] - price_data['Low']) / price_data['Close']
+    covariates[:, 7] = stats.zscore(volatility.values)
     
     # Fill NaN values with 0
     covariates = np.nan_to_num(covariates)
@@ -132,13 +139,13 @@ if __name__ == '__main__':
     save_name = 'cvs_stock_processed'
     window_size = 30    # Size of each data window
     stride_size = 5    # How far to move the window each time
-    num_covariates = 7  # Number of features (2 time + 2 OHLCV + 3 technical)
+    num_covariates = 8  # Number of features (2 time + 2 OHLCV + 4 technical)
     train_start = '2019-12-03'
     train_end = '2023-09-30'
     test_start = '2023-09-25'
     test_end = '2025-01-10'
     pred_days = 5       # Prediction horizon
-    given_days = 25      # Historical data window
+    given_days = 25     # Historical data window
 
     # Create save directory
     save_path = os.path.join('data', save_name)
@@ -164,7 +171,7 @@ if __name__ == '__main__':
     
     # Generate features
     # pre-select features using PCMCI
-    price_data = data_frame[['Open', 'Close', 'Volume']]
+    price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume']]
     covariates = gen_covariates(data_frame[train_start:test_end].index, price_data, num_covariates)
 
     # Split data
