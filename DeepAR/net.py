@@ -77,7 +77,7 @@ class Net(nn.Module):
         self.params = params
         self.embedding = nn.Embedding(params.num_class, params.embedding_dim)
         
-        # 主LSTM层保持不变
+        # Main LSTM layer remains unchanged
         self.lstm = nn.LSTM(input_size=1+params.cov_dim+params.embedding_dim,
                           hidden_size=params.lstm_hidden_dim,
                           num_layers=params.lstm_layers,
@@ -85,40 +85,40 @@ class Net(nn.Module):
                           batch_first=False,
                           dropout=params.lstm_dropout)
         
-        # 添加简单的注意力机制
+        # Add simple attention mechanism
         self.attention = nn.Linear(params.lstm_hidden_dim, 1)
         
         # 添加残差连接
         self.skip_connection = nn.Linear(1+params.cov_dim+params.embedding_dim, 
                                        params.lstm_hidden_dim)
         
-        # 输出层保持原有结构
+        # Add residual connection
         self.distribution_mu = nn.Linear(params.lstm_hidden_dim * params.lstm_layers, 1)
         self.distribution_presigma = nn.Linear(params.lstm_hidden_dim * params.lstm_layers, 1)
         self.distribution_sigma = nn.Softplus()
 
     def forward(self, x, idx, hidden, cell):
         '''
-        增强版前向传播
+        Enhanced forward propagation
         '''
-        # 1. 嵌入处理
+        # 1. Embedding processing
         onehot_embed = self.embedding(idx)
         lstm_input = torch.cat((x, onehot_embed), dim=2)
         
-        # 2. 保存输入用于残差连接
+        # 2. Save input for residual connection
         skip_connection = self.skip_connection(lstm_input)
         
-        # 3. LSTM处理
+        # 3. LSTM processing
         output, (hidden, cell) = self.lstm(lstm_input, (hidden, cell))
         
-        # 4. 注意力机制
+        # 4. Attention mechanism
         attention_weights = torch.softmax(self.attention(output), dim=0)
         attended_output = attention_weights * output
         
-        # 5. 残差连接
+        # 5. Residual connection
         final_hidden = hidden + skip_connection[-1].unsqueeze(0).repeat(hidden.size(0), 1, 1)
         
-        # 6. 计算输出
+        # 6. Calculate output
         hidden_permute = final_hidden.permute(1, 2, 0).contiguous().view(hidden.shape[1], -1)
         pre_sigma = self.distribution_presigma(hidden_permute)
         mu = self.distribution_mu(hidden_permute)
@@ -207,11 +207,11 @@ def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
     
     # Emphasize small changes using a custom weight function
     change_magnitude = torch.abs(true_diff)
-    weights = torch.exp(-2 * change_magnitude) # 给小变化更大的权重
+    weights = torch.exp(-2 * change_magnitude) # Assign higher weights to small changes
     small_change_loss = torch.mean(weights * torch.abs(pred_diff - true_diff))
     
     # 3. Anti-smoothing loss
-    # 惩罚过度平滑，鼓励预测值表现出适当的波动
+    # Penalize over-smoothing, encourage appropriate fluctuations in predictions
     smoothness = torch.mean(torch.abs(pred_diff))
     target_smoothness = torch.mean(torch.abs(true_diff))
     smoothing_penalty = torch.abs(smoothness - target_smoothness)
@@ -222,7 +222,7 @@ def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
         pred_windows = mu_valid.unfold(0, window_size, 1)
         true_windows = labels_valid.unfold(0, window_size, 1)
         
-        # 计算局部模式的差异
+        # Local pattern matching
         pred_patterns = pred_windows - pred_windows.mean(dim=1, keepdim=True)
         true_patterns = true_windows - true_windows.mean(dim=1, keepdim=True)
         pattern_loss = F.mse_loss(pred_patterns, true_patterns)
@@ -231,9 +231,9 @@ def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
     
     # Combine losses with emphasis on small changes
     total_loss = (1.0 * likelihood_loss + 
-                 1.0 * small_change_loss +  # 增加小变化损失的权重
-                 0.5 * smoothing_penalty +   # 添加平滑惩罚
-                 0.5 * pattern_loss)        # 保持局部模式
+                 1.0 * small_change_loss +  # Increase weight of small change loss
+                 0.5 * smoothing_penalty +   # Add smoothing penalty
+                 0.5 * pattern_loss)        # Maintain local patterns
     
     return total_loss
 
