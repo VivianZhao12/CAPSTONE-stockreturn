@@ -10,20 +10,20 @@ Our framework combines three main components:
 - Economic impact analysis using nowcasting
 
 ## Project Structure
-
+```bash
 CAPSTONE-stockreturn/
-├── DeepAR/                  # DeepAR model implementation
-│   ├── experiments/         # Experiment results
-│   └── README.md           # DeepAR specific documentation
-├── FinBERT/                # FinBERT implementation
-├── data/                   # Main data directory
-│   ├── macro_micro/       # Economic indicators
-│   ├── sentiment/         # Processed sentiment data
-│   └── stock/            # Historical stock data
-└── requirements.txt       # Project dependencies
+├── DeepAR/                    # DeepAR model implementation
+│   ├── experiments/           # Experiment results
+│   └── README.md             # DeepAR specific documentation
+├── FinBERT/                  # FinBERT implementation
+├── data/                     # Main data directory
+│   ├── macro_micro/         # Economic indicators
+│   ├── sentiment/           # Processed sentiment data
+│   └── stock/              # Historical stock data
+└── requirements.txt         # Project dependencies
+```
 
 ## Setup Instructions
-
 1. Clone this repository:
 ```bash
 git clone https://github.com/VivianZhao12/CAPSTONE-stockreturn.git
