@@ -154,7 +154,7 @@ if __name__ == '__main__':
 
     # Load and prepare data
     # csv_path = os.path.join('https://raw.githubusercontent.com/VivianZhao12/CAPSTONE-stockreturn/refs/heads/master/Data/', name)
-    csv_path = '../Data/goog_stock.csv'
+    csv_path = '../Data/stock/goog_stock.csv'
     data_frame = pd.read_csv(csv_path, parse_dates=True)
     
     # Process date column
