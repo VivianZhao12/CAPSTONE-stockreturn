@@ -54,6 +54,7 @@ python DeepAR/train.py --config config.yml
 2. Sentiment Analysis
   ```bash
 # Scraping and interpolating data from Google and CSV
+Note: please change the saving directory of the data to: data/sentiment
 python Sentiment_data/Google_and_CSV_data_sraping.ipynb
 
 python Sentiment_data/Sentiment_score_with_interpolation.ipynb
