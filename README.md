@@ -55,6 +55,7 @@ python DeepAR/train.py --config config.yml
   ```bash
 # Scraping and interpolating data from Google and CSV
 python Sentiment_data/Google_and_CSV_data_sraping.ipynb
+
 python Sentiment_data/Sentiment_score_with_interpolation.ipynb
 ```
 
