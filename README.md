@@ -51,7 +51,12 @@ python DeepAR/preprocess.py
 python DeepAR/train.py --config config.yml
 ```
 
-2. Sentiment Analysis(In Development)
+2. Sentiment Analysis
+  ```bash
+# Scraping and interpolating data from Google and CSV
+python Sentiment_data/Google_and_CSV_data_sraping.ipynb
+python Sentiment_data/Sentiment_score_with_interpolation.ipynb
+```
 
-3. Economic Impact Analysis (In Development)
+4. Economic Impact Analysis (In Development)
 
