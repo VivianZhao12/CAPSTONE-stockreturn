@@ -11,13 +11,7 @@ Acknowledgement: Professor Xifeng Yan's group at UC Santa Barbara. Part of the w
 https://github.com/zhykoties/TimeSeries
 
 
-# List of Implementations:
-Currently, the reimplementation of the DeepAR paper(DeepAR: Probabilistic Forecasting with Autoregressive Recurrent Networks https://arxiv.org/abs/1704.04110) is available in PyTorch. More papers will be coming soon.
-
-
 ## To run:
-
-
 1. Install all dependencies listed in requirements.txt. Note that the model has only been tested in the versions shown in the text file.
 
 1. Download the dataset and preprocess the data:
@@ -52,4 +46,7 @@ Currently, the reimplementation of the DeepAR paper(DeepAR: Probabilistic Foreca
    ```bash
     python search_params.py
    ```
+
+## Reference:
+The reimplementation of the DeepAR paper(DeepAR: Probabilistic Forecasting with Autoregressive Recurrent Networks https://arxiv.org/abs/1704.04110) is available in PyTorch. 
 
