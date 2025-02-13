@@ -119,6 +119,9 @@ def gen_covariates(times, price_data, num_covariates):
     # Volatility (significant relationships in the system)
     volatility = (price_data['High'] - price_data['Low']) / price_data['Close']
     covariates[:, 7] = stats.zscore(volatility.values)
+
+    # Sentiment Impact
+    covariates[:, 8] = stats.zscore(price_data['Sentiment_Score'].shift(5).values)
     
     # Fill NaN values with 0
     covariates = np.nan_to_num(covariates)
@@ -135,14 +138,14 @@ def visualize(data, week_start):
 if __name__ == '__main__':
     # Configuration
     save_path = ''
-    name = 'goog_stock.csv'
-    save_name = 'goog_stock_processed'
+    name = 'cvs_stock_wsenti.csv'
+    save_name = 'cvs_stock_processed'
     window_size = 30    # Size of each data window
     stride_size = 5    # How far to move the window each time
-    num_covariates = 8  # Number of features (2 time + 2 OHLCV + 4 technical)
-    train_start = '2019-12-03'
-    train_end = '2023-09-30'
-    test_start = '2023-09-25'
+    num_covariates = 9  # Number of features (2 time + 2 OHLCV + 4 technical)
+    train_start = '2020-06-01'
+    train_end = '2023-05-30'
+    test_start = '2023-05-25'
     test_end = '2025-01-10'
     pred_days = 5       # Prediction horizon
     given_days = 25     # Historical data window
@@ -153,8 +156,7 @@ if __name__ == '__main__':
         os.makedirs(save_path)
 
     # Load and prepare data
-    # csv_path = os.path.join('https://raw.githubusercontent.com/VivianZhao12/CAPSTONE-stockreturn/refs/heads/master/Data/', name)
-    csv_path = '../Data/stock/goog_stock.csv'
+    csv_path = '../data/stock/cvs_stock_wsenti.csv'
     data_frame = pd.read_csv(csv_path, parse_dates=True)
     
     # Process date column
@@ -171,7 +173,7 @@ if __name__ == '__main__':
     
     # Generate features
     # pre-select features using PCMCI
-    price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume']]
+    price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume', 'Sentiment_Score']]
     covariates = gen_covariates(data_frame[train_start:test_end].index, price_data, num_covariates)
 
     # Split data
