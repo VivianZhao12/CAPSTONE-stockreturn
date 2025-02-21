@@ -14,7 +14,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 #import model.net as net
-from model import net
+import net as net
 logger = logging.getLogger('DeepAR.Utils')
 
 
@@ -194,6 +194,7 @@ def update_metrics(raw_metrics, input_mu, input_sigma, sample_mu, labels, predic
         raw_metrics['rou90'] = raw_metrics['rou90'] + net.accuracy_ROU(0.9, samples, labels[:, predict_start:], relative=relative)
         raw_metrics['rou50'] = raw_metrics['rou50'] + net.accuracy_ROU(0.5, samples, labels[:, predict_start:], relative=relative)
     return raw_metrics
+
 
 def final_metrics(raw_metrics, sampling=False):
     summary_metric = {}

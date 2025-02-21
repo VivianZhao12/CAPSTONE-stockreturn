@@ -24,29 +24,32 @@ def prep_data(data, covariates, data_start, train=True):
         data_start: When each series begins
         train: Boolean to indicate if processing training or test data
     """
-    time_len = data.shape[0]
-    input_size = window_size - stride_size  # Size of input portion
-    
+    time_len = data.shape[0] # 获取数据的时间长度
+    input_size = window_size - stride_size  # Size of input portion, 计算输入窗口大小（30-5=25）
+
+    # 计算可以生成多少个窗口
     windows_per_series = np.full((num_series), (time_len-input_size) // stride_size)
     if train:
         windows_per_series -= (data_start+stride_size-1) // stride_size
     
     total_windows = np.sum(windows_per_series)
-    x_input = np.zeros((total_windows, window_size, 1 + num_covariates + 1), dtype='float32')
-    label = np.zeros((total_windows, window_size), dtype='float32')
-    v_input = np.zeros((total_windows, 2), dtype='float32')
+    x_input = np.zeros((total_windows, window_size, 1 + num_covariates + 1), dtype='float32') #输入特征
+    label = np.zeros((total_windows, window_size), dtype='float32')  #预测目标
+    v_input = np.zeros((total_windows, 2), dtype='float32')  #缩放因子
     
     count = 0
     if not train:
-        covariates = covariates[-time_len:]
+        covariates = covariates[-time_len:]  # testdata: 只取test部分的covariate
         
     for series in trange(num_series):
+        # 计算时间特征的z-score
         cov_age = stats.zscore(np.arange(total_time-data_start[series]))
         if train:
             covariates[data_start[series]:time_len, 0] = cov_age[:time_len-data_start[series]]
         else:
             covariates[:, 0] = cov_age[-time_len:]
-            
+        
+        #计算每个窗口的起始和结束位置 - 对于全部都是交易日的数据来说, data_start不起作用
         for i in range(windows_per_series[series]):
             if train:
                 window_start = stride_size*i+data_start[series]
@@ -62,15 +65,18 @@ def prep_data(data, covariates, data_start, train=True):
             x_input[count, :, -1] = series
             # Set labels
             label[count, :] = data[window_start:window_end, series]
-            
+
             # Calculate scaling factors
-            nonzero_sum = (x_input[count, 1:input_size, 0]!=0).sum()
+            nonzero_sum = (x_input[count, 1:input_size, 0]!=0).sum() # 计算非零值的数量
             if nonzero_sum == 0:
                 v_input[count, 0] = 0
             else:
+                # 计算非零值的平均值并加1
                 v_input[count, 0] = np.true_divide(x_input[count, 1:input_size, 0].sum(), nonzero_sum)+1
+                # 用缩放因子对输入数据进行标准化 - 将不同范围的数据转换到相似的尺度
                 x_input[count, :, 0] = x_input[count, :, 0]/v_input[count, 0]
                 if train:
+                    # 如果是训练数据，也对标签进行相同的标准化
                     label[count, :] = label[count, :]/v_input[count, 0]
             count += 1
             

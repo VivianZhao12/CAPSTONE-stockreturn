@@ -10,7 +10,7 @@ from torch.utils.data.sampler import RandomSampler
 from tqdm import tqdm
 
 import utils
-import model.net as net
+from model import net
 from evaluate import evaluate
 from dataloader import *
 
@@ -51,10 +51,6 @@ def train(model: nn.Module,
     '''
     model.train()
     loss_epoch = np.zeros(len(train_loader))
-    # Train_loader:
-    # train_batch ([batch_size, train_window, 1+cov_dim]): z_{0:T-1} + x_{1:T}, note that z_0 = 0;
-    # idx ([batch_size]): one integer denoting the time series id;
-    # labels_batch ([batch_size, train_window]): z_{1:T}.
     
     for i, (train_batch, idx, labels_batch) in enumerate(tqdm(train_loader)):
         optimizer.zero_grad()
@@ -79,8 +75,9 @@ def train(model: nn.Module,
 
         loss.backward()
         optimizer.step()
+        
         loss = loss.item()
-        # loss = loss.item() / params.train_window  # loss per timestep
+        
         loss_epoch[i] = loss
         if i % 1000 == 0:
             test_metrics = evaluate(model, loss_fn, test_loader, params, epoch, sample=args.sampling)
