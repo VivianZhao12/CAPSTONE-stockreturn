@@ -78,7 +78,7 @@ if __name__ == "__main__":
     fred_data = fetch_fred_data(fred_series, "2019-01-01")
     fred_data.to_csv(os.path.join(FRED_DIR, "fred_data.csv"), index=False)
     
-    # api_key = "C0E1JBHIL5VPHPX4"
+    # api_key = ""
     # for ticker in tickers:
     #     financial_data = fetch_company_financials(ticker, api_key)
     #     financial_data.to_csv(os.path.join(FINANCIAL_DIR, f"{ticker.lower()}_financial_data.csv"), index=False)
@@ -173,9 +173,22 @@ if __name__ == "__main__":
 
             # Save causal graph
             pyd = GraphUtils.to_pydot(cg.G)
-            graph_image_path = os.path.join(os.path.join(CDNOD_DIR, f'{ticker.lower()}_fisherz_M.png'))
+            graph_image_path = os.path.join(CDNOD_DIR, f'{ticker.lower()}_fisherz_M.png')
             pyd.write_png(graph_image_path)
             print(f"Graph saved at: {graph_image_path}")
+            # Extract causal edges
+            edges = []
+            for i, j in zip(*np.where(cg.G.graph != 0)):
+                if i >= X.shape[1] or j >= X.shape[1]:  # Prevent out-of-bounds errors
+                    print(f"Skipping edge ({i}, {j}) - Out of bounds!")
+                    continue
+                x1 = amgn_preprocessed.columns[i]
+                x2 = amgn_preprocessed.columns[j]
+                edges.append({"x1": x1, "x2": x2})
+
+            edges_df = pd.DataFrame(edges)
+            edges_csv_path = os.path.join(CDNOD_DIR, f'{ticker.lower()}_fisherz_M.csv')
+            edges_df.to_csv(edges_csv_path, index=False)
 
 
         except Exception as e:
