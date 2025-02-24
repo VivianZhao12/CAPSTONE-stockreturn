@@ -11,7 +11,7 @@
     "given_days": 25,
     "pred_days": 5, 
     "num_class": 1284, 
-    "cov_dim": 9,
+    "cov_dim": 8,
     "lstm_hidden_dim": 96,
     "embedding_dim": 24,
     "sample_times": 100,

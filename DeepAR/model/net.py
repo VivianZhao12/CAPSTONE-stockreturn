@@ -122,58 +122,8 @@ def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
     distribution = torch.distributions.normal.Normal(mu[zero_index], sigma[zero_index])
     likelihood = distribution.log_prob(labels[zero_index])
     return -torch.mean(likelihood)
-
-# new loss
-def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
-    '''Enhanced loss function focusing on small fluctuations'''
-    zero_index = (labels != 0)
-    mu_valid = mu[zero_index]
-    labels_valid = labels[zero_index]
-    
-    if len(mu_valid) < 2:
-        return torch.tensor(0.0, device=mu.device)
-    
-    # 1. Base likelihood loss
-    distribution = torch.distributions.normal.Normal(mu[zero_index], sigma[zero_index])
-    likelihood_loss = -torch.mean(distribution.log_prob(labels[zero_index]))
-    
-    # 2. Small changes detection loss
-    pred_diff = mu_valid[1:] - mu_valid[:-1]
-    true_diff = labels_valid[1:] - labels_valid[:-1]
-    
-    # Emphasize small changes using a custom weight function
-    change_magnitude = torch.abs(true_diff)
-    # weights = torch.exp(-2 * change_magnitude) # Assign higher weights to small changes
-    weights = 1.0 + torch.exp(-10 * change_magnitude)  # 给小变化更大的权重
-    small_change_loss = torch.mean(weights * torch.abs(pred_diff - true_diff))
-    
-    # 3. Anti-smoothing loss
-    # Penalize over-smoothing, encourage appropriate fluctuations in predictions
-    smoothness = torch.mean(torch.abs(pred_diff))
-    target_smoothness = torch.mean(torch.abs(true_diff))
-    smoothing_penalty = torch.abs(smoothness - target_smoothness)
-    
-    # 4. Local pattern matching
-    window_size = 3
-    if len(mu_valid) > window_size:
-        pred_windows = mu_valid.unfold(0, window_size, 1)
-        true_windows = labels_valid.unfold(0, window_size, 1)
-        
-        # Local pattern matching
-        pred_patterns = pred_windows - pred_windows.mean(dim=1, keepdim=True)
-        true_patterns = true_windows - true_windows.mean(dim=1, keepdim=True)
-        pattern_loss = F.mse_loss(pred_patterns, true_patterns)
-    else:
-        pattern_loss = torch.tensor(0.0, device=mu.device)
-    
-    # Combine losses with emphasis on small changes
-    total_loss = (1.0 * likelihood_loss + 
-                 2.0 * small_change_loss +  # Increase weight of small change loss
-                 0.8 * smoothing_penalty +   # Add smoothing penalty
-                 1.5 * pattern_loss)        # Maintain local patterns
-    
-    return total_loss
 """
+# new loss: good capture at small fluctuation, but need improve accuracy
 def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
     '''Enhanced loss function focusing on matching exact fluctuation amplitudes'''
     zero_index = (labels != 0)
@@ -215,6 +165,8 @@ def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
                  2.0 * relative_loss)          # 确保波动幅度比例正确
     
     return total_loss
+
+
 
 """
 # original 

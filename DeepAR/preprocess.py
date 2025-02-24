@@ -127,7 +127,7 @@ def gen_covariates(times, price_data, num_covariates):
     covariates[:, 7] = stats.zscore(volatility.values)
 
     # Sentiment Impact
-    covariates[:, 8] = stats.zscore(price_data['Sentiment_Score'].shift(5).values)
+    # covariates[:, 8] = stats.zscore(price_data['Sentiment_Score'].shift(5).values)
     
     # Fill NaN values with 0
     covariates = np.nan_to_num(covariates)
@@ -144,11 +144,11 @@ def visualize(data, week_start):
 if __name__ == '__main__':
     # Configuration
     save_path = ''
-    name = 'cvs_stock_wsenti.csv'
-    save_name = 'cvs_stock_processed'
+    name = 'amgn_stock.csv'
+    save_name = 'amgn_stock_processed'
     window_size = 30    # Size of each data window
     stride_size = 5    # How far to move the window each time
-    num_covariates = 9  # Number of features (2 time + 2 OHLCV + 4 technical)
+    num_covariates = 8  # Number of features (2 time + 2 OHLCV + 4 technical)
     train_start = '2020-06-01'
     train_end = '2023-05-30'
     test_start = '2023-05-25'
@@ -162,7 +162,7 @@ if __name__ == '__main__':
         os.makedirs(save_path)
 
     # Load and prepare data
-    csv_path = '../data/stock/cvs_stock_wsenti.csv'
+    csv_path = '../data/stock/amgn_stock.csv'
     data_frame = pd.read_csv(csv_path, parse_dates=True)
     
     # Process date column
@@ -179,7 +179,8 @@ if __name__ == '__main__':
     
     # Generate features
     # pre-select features using PCMCI
-    price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume', 'Sentiment_Score']]
+    # price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume', 'Sentiment_Score']]
+    price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume']]
     covariates = gen_covariates(data_frame[train_start:test_end].index, price_data, num_covariates)
 
     # Split data
