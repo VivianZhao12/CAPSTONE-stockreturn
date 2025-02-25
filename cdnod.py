@@ -30,11 +30,21 @@ os.makedirs(CDNOD_DIR, exist_ok=True)
 def fetch_stock_data(ticker, start_date, end_date):
     print(f"Fetching data for {ticker}...")
     data = yf.download(ticker, start=start_date, end=end_date, interval="1d", auto_adjust=False)
-    if not data.empty:
-        data['Ticker'] = ticker
-        data.reset_index(inplace=True)
-        data["Return"] = data["Close"].pct_change()
-        data = data.apply(pd.to_numeric, errors='coerce')
+
+    if data.empty:
+        print(f"Warning: No data fetched for {ticker}. Exiting...")
+        return None
+
+    data['Ticker'] = ticker 
+    data.reset_index(inplace=True)
+    data.columns = ["Date", "Adj Close", "Close", "High", "Low", "Open", "Volume", "Ticker"]
+
+    if ticker in ["AMZN", "GOOG","T"]:
+        data["Industry"] = ["Tech" for i in range(len(data["Adj Close"]))]
+    else:
+        data["Industry"] = ["Health" for i in range(len(data["Adj Close"]))]
+    data["Daily Return"] = data["Close"].pct_change()
+        
     return data
 
 # Fetch economic indicators
