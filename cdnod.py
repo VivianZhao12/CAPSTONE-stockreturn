@@ -158,8 +158,6 @@ if __name__ == "__main__":
 
         # Drop non-numeric columns
         amgn_preprocessed = merged_data.drop(columns=["Date", "Month", "Month_Label","DATE","group"])
-        column_mapping = {f"x{i+1}": col for i, col in enumerate(amgn_preprocessed.columns)}
-        dict[ticker] = column_mapping
         
         
         # Remove highly correlated columns
@@ -168,6 +166,8 @@ if __name__ == "__main__":
         to_drop = [column for column in upper_triangle.columns if any(upper_triangle[column] > corr)]
         amgn_preprocessed = amgn_preprocessed.drop(columns=to_drop)
         amgn_preprocessed["Close"] = amgn_preprocessed["Close"].astype(float)
+        column_mapping = {f"x{i+1}": col for i, col in enumerate(amgn_preprocessed.columns)}
+        dict[ticker] = column_mapping
 
         # Convert data to NumPy array
         X = amgn_preprocessed.to_numpy()
@@ -186,15 +186,32 @@ if __name__ == "__main__":
             graph_image_path = os.path.join(CDNOD_DIR, f'{ticker.lower()}_fisherz_M.png')
             pyd.write_png(graph_image_path)
             print(f"Graph saved at: {graph_image_path}")
-            # Extract causal edges
+
             edges = []
-            for i, j in zip(*np.where(cg.G.graph != 0)):
-                if i >= X.shape[1] or j >= X.shape[1]:  # Prevent out-of-bounds errors
+            graph_matrix = cg.G.graph  # Adjacency matrix (directed + undirected edges)
+            num_vars = min(X.shape[1], graph_matrix.shape[0])  # Ensure index consistency
+
+            print(f"Graph matrix size: {graph_matrix.shape}, Processed data size: {X.shape}")
+
+            for i, j in zip(*np.where(graph_matrix != 0)):  # Capture all nonzero edges
+                if i >= num_vars or j >= num_vars:  # Prevent out-of-bounds errors
                     print(f"Skipping edge ({i}, {j}) - Out of bounds!")
-                    continue
-                x1 = amgn_preprocessed.columns[i]
-                x2 = amgn_preprocessed.columns[j]
-                edges.append({"x1": x1, "x2": x2})
+                    continue  # Skip invalid indices
+
+                try:
+                    x1 = amgn_preprocessed.columns[i]  # Cause variable
+                    x2 = amgn_preprocessed.columns[j]  # Effect variable
+
+                    if graph_matrix[i, j] == 1 and graph_matrix[j, i] == 1:  # Undirected → store both ways
+                        if {"cause": x1, "effect": x2} not in edges:  # Prevent duplicate storage
+                            edges.append({"cause": x2, "effect": x1})
+                            edges.append({"cause": x1, "effect": x2})
+                            print(f"Stored Undirected Edges: {x1} ↔ {x2}")  # Debugging print
+                    elif graph_matrix[i, j] == 1:  # Directed edge → store only one way
+                        edges.append({"cause": x2, "effect": x1})
+                        print(f"Stored Directed Edge: {x1} → {x2}")  # Debugging print
+                except IndexError:
+                    print(f"Skipping edge ({i}, {j}) - Index out of range for ticker: {ticker}")
 
             edges_df = pd.DataFrame(edges)
             edges_csv_path = os.path.join(CDNOD_DIR, f'{ticker.lower()}_fisherz_M.csv')
