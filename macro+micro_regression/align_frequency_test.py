@@ -7,12 +7,6 @@ from datetime import datetime, timedelta
 from sklearn.preprocessing import StandardScaler
 import os
 
-BASE_DIR = "data"
-STOCK_DIR = os.path.join(BASE_DIR, "stock")
-FINANCIAL_DIR = os.path.join(BASE_DIR, "financial")
-FRED_DIR = os.path.join(BASE_DIR, "economic")
-CDNOD_DIR = os.path.join("cdnod+nowcasting", "cdnod_graph")
-aligned_macromicro_DIR = os.path.join(BASE_DIR, "macro_micro")
 
 
 def conver_to_quarterly_return(data):
@@ -34,8 +28,8 @@ def hypothesis_prep(df):
     # Rename columns to more meaningful names
     df = df.rename(columns={
         "DATE": "observation_date",
-        "M2SL": "Money_Supply_M2",
-        "M1SL": "Money_Supply_M1",
+        "M2SL": "Money_Supply_2",
+        "M1SL": "Money_Supply_1",
         "FEDFUNDS": "Interest_Rate",
         "PPIACO": "PPI",
         "RTWEXBGS": "Real_Dollar_Index",
@@ -45,7 +39,7 @@ def hypothesis_prep(df):
     })
 
     # Select independent variables for standardization
-    independent_vars = df[['Money_Supply_M2', 'Money_Supply_M1',
+    independent_vars = df[['Money_Supply_2', 'Money_Supply_1',
         'Interest_Rate', 'PPI', 'Real_Dollar_Index', 'Unemployment_Rate', 'CPI',
         'GDP']]
     
@@ -77,19 +71,19 @@ def hypothesis_prep(df):
     df_third_month = standardized_df[standardized_df["month_position"] == 0].copy()  
 
     # Merge by quarter
-    df_quarterly = df_first_month[["quarter", "Money_Supply_M2", "Money_Supply_M1", "Interest_Rate", "PPI",
+    df_quarterly = df_first_month[["quarter", "Money_Supply_2", "Money_Supply_1", "Interest_Rate", "PPI",
                                    "Real_Dollar_Index", "Unemployment_Rate", "CPI"]].rename(
         columns=lambda x: x + "_M1" if x != "quarter" else x)
 
     df_quarterly = df_quarterly.merge(
-        df_second_month[["quarter", "Money_Supply_M2", "Money_Supply_M1", "Interest_Rate", "PPI",
+        df_second_month[["quarter", "Money_Supply_2", "Money_Supply_1", "Interest_Rate", "PPI",
                          "Real_Dollar_Index", "Unemployment_Rate", "CPI"]].rename(
             columns=lambda x: x + "_M2" if x != "quarter" else x),
         on="quarter", how="inner"
     )
 
     df_quarterly = df_quarterly.merge(
-        df_third_month[["quarter", "Money_Supply_M2", "Money_Supply_M1", "Interest_Rate", "PPI",
+        df_third_month[["quarter", "Money_Supply_2", "Money_Supply_1", "Interest_Rate", "PPI",
                         "Real_Dollar_Index", "Unemployment_Rate", "CPI", "GDP"]].rename(
             columns=lambda x: x + "_M3" if x not in ["quarter", "GDP"] else x),
         on="quarter", how="inner"
@@ -104,7 +98,7 @@ def hypothesis_test(merged_data):
     exclude_columns = ["Quarter", "observation_date", dependent_var]  # Add other non-numeric columns here
 
     # Filter numeric independent variables
-    independent_vars = ['Money_Supply_M2', 'Money_Supply_M1', 'Interest_Rate', 'PPI',
+    independent_vars = ['Money_Supply_2', 'Money_Supply_1', 'Interest_Rate', 'PPI',
         'Real_Dollar_Index', 'CPI', 'Unemployment_Rate']
 
 
@@ -151,7 +145,7 @@ def hypothesis_test(merged_data):
     selected_months = best_month_df["Best Month"].to_dict()  # Dictionary mapping variable to its best month
 
     # Create the final dataset with only the selected month's data
-    selected_columns = ["quarter", "GDP"]  # Start with essential columns
+    selected_columns = ["quarter", "GDP",'Quarterly_Return']  # Start with essential columns
 
     for var, best_month in selected_months.items():
         selected_columns.append(f"{var}_{best_month}")  # Add the best month's column for the variable
@@ -173,9 +167,16 @@ def hypothesis_test(merged_data):
 
 
 if __name__ == '__main__':
-    
     # Configuration:
-    for ticker in ["AMZN","GOOG","ABT","CVS","AMGN","T"]:
+    BASE_DIR = "../data"
+    STOCK_DIR = os.path.join(BASE_DIR, "stock")
+    FINANCIAL_DIR = os.path.join(BASE_DIR, "financial")
+    FRED_DIR = os.path.join(BASE_DIR, "economic")
+    CDNOD_DIR = os.path.join("macro+micro_regressio/cdnod", "cdnod_graph")
+    aligned_macromicro_DIR = os.path.join(BASE_DIR, "macro_micro")
+    tickers = ["AMZN","GOOG","ABT","CVS","AMGN","T"]
+
+    for ticker in tickers:
         
         data_path = os.path.join(FRED_DIR, "fred_data.csv")
         stock = pd.read_csv(os.path.join(STOCK_DIR, f'{ticker.lower()}_stock_data.csv'))
