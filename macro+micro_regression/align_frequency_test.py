@@ -110,7 +110,7 @@ def hypothesis_test(merged_data):
         }
     best_month_df = pd.DataFrame.from_dict(best_month_results, orient="index")
     selected_months = best_month_df["Best Month"].to_dict()
-    selected_columns = ["quarter", "GDP"]
+    selected_columns = ["quarter", "GDP", "Quarterly_Return"]
 
     for var, best_month in selected_months.items():
         selected_columns.append(f"{var}_{best_month}")
