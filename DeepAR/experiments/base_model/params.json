@@ -1,7 +1,7 @@
 {
     "learning_rate": 0.006,
     "batch_size": 32,
-    "lstm_layers": 4,
+    "lstm_layers": 3,
     "num_epochs": 25, 
     "train_window": 30,
     "test_window": 30,
@@ -10,7 +10,7 @@
     "predict_steps": 5,
     "given_days": 25,
     "pred_days": 5, 
-    "num_class": 1284, 
+    "num_class": 1, 
     "cov_dim": 8,
     "lstm_hidden_dim": 96,
     "embedding_dim": 24,
