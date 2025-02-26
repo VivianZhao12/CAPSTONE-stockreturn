@@ -1,8 +1,8 @@
 {
-    "learning_rate": 0.0006,
+    "learning_rate": 0.006,
     "batch_size": 32,
-    "lstm_layers": 2,
-    "num_epochs": 15, 
+    "lstm_layers": 4,
+    "num_epochs": 25, 
     "train_window": 30,
     "test_window": 30,
     "predict_start":25,
