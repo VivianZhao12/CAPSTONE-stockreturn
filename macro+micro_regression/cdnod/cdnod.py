@@ -15,10 +15,10 @@ import json
 
 # Define directories
 BASE_DIR = "data"
-STOCK_DIR = os.path.join(BASE_DIR, "stock")
-FINANCIAL_DIR = os.path.join(BASE_DIR, "financial")
-FRED_DIR = os.path.join(BASE_DIR, "economic")
-CDNOD_DIR = os.path.join("cdnod+nowcasting", "cdnod_graph")
+STOCK_DIR = os.path.join("..","..",BASE_DIR, "stock")
+FINANCIAL_DIR = os.path.join("..","..", BASE_DIR, "financial")
+FRED_DIR = os.path.join("..","..", BASE_DIR, "economic")
+CDNOD_DIR = os.path.join("..", "..","macro+micro-regression","cdnod", "cdnod_graph")
 
 # Create directories if they don't exist
 os.makedirs(STOCK_DIR, exist_ok=True)
