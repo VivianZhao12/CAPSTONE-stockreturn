@@ -144,8 +144,8 @@ def visualize(data, week_start):
 if __name__ == '__main__':
     # Configuration
     save_path = ''
-    name = 'cvs_stock_wsenti.csv'
-    save_name = 'cvs_stock_processed'
+    name = 'amzn_stock_wsenti.csv'
+    save_name = 'amzn_stock_processed'
     window_size = 30    # Size of each data window
     stride_size = 5    # How far to move the window each time
     num_covariates = 9  # Number of features (2 time + 2 OHLCV + 4 technical)
@@ -162,7 +162,7 @@ if __name__ == '__main__':
         os.makedirs(save_path)
 
     # Load and prepare data
-    csv_path = '../data/stock/cvs_stock_wsenti.csv'
+    csv_path = '../data/stock/amzn_stock_wsenti.csv'
     data_frame = pd.read_csv(csv_path, parse_dates=True)
     
     # Process date column
