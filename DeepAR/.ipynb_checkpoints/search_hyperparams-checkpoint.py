@@ -22,7 +22,7 @@ args: argparse.ArgumentParser
 search_params: dict
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default='cvs_stock_processed', help='Dataset name')
+parser.add_argument('--dataset', default='elect', help='Dataset name')
 parser.add_argument('--data-dir', default='data', help='Directory containing the dataset')
 parser.add_argument('--model-name', default='param_search', help='Parent directory for all jobs')
 parser.add_argument('--relative-metrics', action='store_true', help='Whether to normalize the metrics by label scales')
