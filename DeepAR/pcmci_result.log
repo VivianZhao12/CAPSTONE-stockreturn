@@ -1,0 +1,255 @@
+
+##
+## Step 1: PC1 algorithm for selecting lagged conditions
+##
+
+Parameters:
+independence test = par_corr
+tau_min = 1
+tau_max = 5
+pc_alpha = [0.05]
+max_conds_dim = None
+max_combinations = 1
+
+
+
+## Resulting lagged parent (super)sets:
+
+    Variable age has 5 link(s):
+        (age -1): max_pval = 0.00000, |min_val| =  1.000
+        (age -2): max_pval = 0.00000, |min_val| =  1.000
+        (age -3): max_pval = 0.00000, |min_val| =  1.000
+        (age -4): max_pval = 0.00000, |min_val| =  1.000
+        (age -5): max_pval = 0.00000, |min_val| =  1.000
+
+    Variable weekday has 4 link(s):
+        (weekday -5): max_pval = 0.00000, |min_val| =  0.670
+        (weekday -2): max_pval = 0.00007, |min_val| =  0.138
+        (weekday -3): max_pval = 0.00391, |min_val| =  0.100
+        (weekday -4): max_pval = 0.02577, |min_val| =  0.078
+
+    Variable month has 1 link(s):
+        (month -1): max_pval = 0.00000, |min_val| =  0.703
+
+    Variable Open has 3 link(s):
+        (Close -1): max_pval = 0.00000, |min_val| =  0.685
+        (MACD -3): max_pval = 0.00461, |min_val| =  0.099
+        (MACD -4): max_pval = 0.03092, |min_val| =  0.075
+
+    Variable Close has 4 link(s):
+        (Close -1): max_pval = 0.00000, |min_val| =  0.421
+        (MACD -3): max_pval = 0.00042, |min_val| =  0.123
+        (MACD -4): max_pval = 0.00046, |min_val| =  0.122
+        (MA5 -4): max_pval = 0.01801, |min_val| =  0.083
+
+    Variable High has 5 link(s):
+        (Close -1): max_pval = 0.00000, |min_val| =  0.506
+        (MACD -3): max_pval = 0.00011, |min_val| =  0.135
+        (High -1): max_pval = 0.00537, |min_val| =  0.097
+        (MACD -2): max_pval = 0.00857, |min_val| =  0.092
+        (MACD -4): max_pval = 0.01099, |min_val| =  0.089
+
+    Variable Low has 5 link(s):
+        (Close -1): max_pval = 0.00000, |min_val| =  0.507
+        (MACD -3): max_pval = 0.00002, |min_val| =  0.147
+        (MACD -4): max_pval = 0.00046, |min_val| =  0.122
+        (MA5 -4): max_pval = 0.01352, |min_val| =  0.086
+        (MACD -5): max_pval = 0.04247, |min_val| =  0.071
+
+    Variable Volume has 5 link(s):
+        (Volume -1): max_pval = 0.00000, |min_val| =  0.293
+        (MA10 -4): max_pval = 0.00010, |min_val| =  0.136
+        (Daily Return -5): max_pval = 0.00635, |min_val| =  0.095
+        (Volume -5): max_pval = 0.01984, |min_val| =  0.081
+        (month -5): max_pval = 0.03402, |min_val| =  0.074
+
+    Variable Volatility has 2 link(s):
+        (Volatility -1): max_pval = 0.00000, |min_val| =  0.237
+        (Volatility -4): max_pval = 0.04506, |min_val| =  0.070
+
+    Variable Trading_Value has 2 link(s):
+        (Trading_Value -1): max_pval = 0.00000, |min_val| =  0.272
+        (Trading_Value -5): max_pval = 0.02975, |min_val| =  0.076
+
+    Variable MA5 has 5 link(s):
+        (MA5 -1): max_pval = 0.00000, |min_val| =  0.744
+        (Close -5): max_pval = 0.00000, |min_val| =  0.528
+        (Close -1): max_pval = 0.00000, |min_val| =  0.326
+        (MACD -3): max_pval = 0.00138, |min_val| =  0.111
+        (MACD -4): max_pval = 0.00165, |min_val| =  0.110
+
+    Variable MA10 has 8 link(s):
+        (MA5 -5): max_pval = 0.00000, |min_val| =  0.872
+        (MACD -5): max_pval = 0.00000, |min_val| =  0.171
+        (MACD -4): max_pval = 0.00000, |min_val| =  0.159
+        (MA10 -1): max_pval = 0.00022, |min_val| =  0.129
+        (High -5): max_pval = 0.00035, |min_val| =  0.124
+        (Low -5): max_pval = 0.00041, |min_val| =  0.123
+        (MA5 -1): max_pval = 0.00063, |min_val| =  0.119
+        (Open -5): max_pval = 0.02564, |min_val| =  0.078
+
+    Variable MA20 has 3 link(s):
+        (MA20 -1): max_pval = 0.00000, |min_val| =  0.702
+        (MA10 -5): max_pval = 0.00001, |min_val| =  0.154
+        (MACD -4): max_pval = 0.03794, |min_val| =  0.072
+
+    Variable Intraday_Return has 1 link(s):
+        (Daily Return -5): max_pval = 0.00000, |min_val| =  0.832
+
+    Variable RSI has 0 link(s):
+
+    Variable MACD has 2 link(s):
+        (MACD -1): max_pval = 0.00000, |min_val| =  0.868
+        (MACD -2): max_pval = 0.00000, |min_val| =  0.368
+
+    Variable Daily Return has 1 link(s):
+        (Intraday_Return -4): max_pval = 0.02956, |min_val| =  0.076
+
+##
+## Step 2: PC algorithm with contemp. conditions and MCI tests
+##
+
+Parameters:
+
+independence test = par_corr
+tau_min = 0
+tau_max = 5
+pc_alpha = 0.05
+contemp_collider_rule = majority
+conflict_resolution = True
+reset_lagged_links = False
+max_conds_dim = None
+max_conds_py = None
+max_conds_px = None
+max_conds_px_lagged = None
+fdr_method = none
+
+## Significant links at alpha = 0.05:
+
+    Variable age has 5 link(s):
+        (age -4): pval = 0.00000 | val =  1.000
+        (age -5): pval = 0.00000 | val =  1.000
+        (age -3): pval = 0.00000 | val =  1.000
+        (age -1): pval = 0.00000 | val =  1.000
+        (age -2): pval = 0.00000 | val =  1.000
+
+    Variable weekday has 5 link(s):
+        (weekday -5): pval = 0.00000 | val =  0.590
+        (weekday -3): pval = 0.00000 | val = -0.279
+        (weekday -2): pval = 0.00000 | val = -0.229
+        (weekday -4): pval = 0.00000 | val = -0.223
+        (month  0): pval = 0.00013 | val =  0.133 | unclear orientation due to conflict
+
+    Variable month has 3 link(s):
+        (month -1): pval = 0.00000 | val =  0.703
+        (weekday  0): pval = 0.00013 | val =  0.133 | unclear orientation due to conflict
+        (MA10  0): pval = 0.04859 | val =  0.069 | unoriented link
+
+    Variable Open has 3 link(s):
+        (Intraday_Return  0): pval = 0.00000 | val = -0.976 | unclear orientation due to conflict
+        (Close -1): pval = 0.00000 | val =  0.251
+        (Close  0): pval = 0.03546 | val = -0.073 | unclear orientation due to conflict
+
+    Variable Close has 3 link(s):
+        (MA5  0): pval = 0.00000 | val =  1.000
+        (High  0): pval = 0.00000 | val =  0.342 | unclear orientation due to conflict
+        (Open  0): pval = 0.03546 | val = -0.073 | unclear orientation due to conflict
+
+    Variable High has 3 link(s):
+        (Close  0): pval = 0.00000 | val =  0.342 | unclear orientation due to conflict
+        (Volatility  0): pval = 0.00000 | val =  0.246
+        (Low  0): pval = 0.00159 | val =  0.110 | unoriented link
+
+    Variable Low has 2 link(s):
+        (Volatility  0): pval = 0.00000 | val = -0.346 | unoriented link
+        (High  0): pval = 0.00159 | val =  0.110 | unoriented link
+
+    Variable Volume has 1 link(s):
+        (Daily Return -5): pval = 0.00071 | val = -0.118
+
+    Variable Volatility has 1 link(s):
+        (Low  0): pval = 0.00000 | val = -0.346 | unoriented link
+
+    Variable Trading_Value has 3 link(s):
+        (Volume  0): pval = 0.00000 | val =  0.986
+        (Trading_Value -1): pval = 0.00003 | val =  0.146
+        (Volatility  0): pval = 0.00131 | val =  0.112
+
+    Variable MA5 has 2 link(s):
+        (MA5 -1): pval = 0.00000 | val =  0.864
+        (Close -5): pval = 0.00000 | val = -0.710
+
+    Variable MA10 has 7 link(s):
+        (MA5 -5): pval = 0.00000 | val =  0.998
+        (MA10 -1): pval = 0.00000 | val =  0.887
+        (Open -5): pval = 0.00000 | val = -0.245
+        (MA5 -1): pval = 0.00000 | val =  0.198
+        (MACD -5): pval = 0.00000 | val =  0.177
+        (Low -5): pval = 0.02493 | val = -0.079
+        (month  0): pval = 0.04859 | val =  0.069 | unoriented link
+
+    Variable MA20 has 1 link(s):
+        (MA20 -1): pval = 0.00000 | val =  0.636
+
+    Variable Intraday_Return has 2 link(s):
+        (Open  0): pval = 0.00000 | val = -0.976 | unclear orientation due to conflict
+        (Daily Return -5): pval = 0.00000 | val =  0.695
+
+    Variable RSI has 0 link(s):
+
+    Variable MACD has 3 link(s):
+        (Daily Return  0): pval = 0.00000 | val =  0.985
+        (MACD -1): pval = 0.00000 | val =  0.868
+        (MACD -2): pval = 0.00000 | val = -0.335
+
+    Variable Daily Return has 1 link(s):
+        (Intraday_Return -4): pval = 0.04431 | val =  0.070
+
+## Ambiguous triples (not used for orientation):
+
+    [(MA10  0), month, weekday]
+    [(weekday -2), weekday, month]
+    [(weekday -3), weekday, month]
+    [(weekday -5), weekday, month]
+    [(Open -5), MA10, month]
+    [(Low -5), MA10, month]
+    [(MA5 -1), MA10, month]
+    [(MA5 -5), MA10, month]
+    [(MA10 -1), MA10, month]
+    [(MACD -5), MA10, month]
+    [(Low  0), High, Close]
+    [(MA5 -1), MA5, Close]
+    [(Trading_Value  0), Volatility, High]
+    [(Close  0), High, Low]
+    [(High  0), Volatility, Trading_Value]
+    [(weekday  0), month, MA10]
+    [(month -1), month, MA10]
+
+Significant causal relationships (p < 0.05):
+weekday ->(0) month: p=0.0001
+month ->(0) weekday: p=0.0001
+month ->(0) MA10: p=0.0486
+Open ->(0) Close: p=0.0355
+Open ->(0) Intraday_Return: p=0.0000
+Close ->(0) Open: p=0.0355
+Close ->(1) Open: p=0.0000
+Close ->(0) High: p=0.0000
+Close ->(0) MA5: p=0.0000
+High ->(0) Close: p=0.0000
+High ->(0) Low: p=0.0016
+High ->(0) Volatility: p=0.0000
+Low ->(0) High: p=0.0016
+Low ->(0) Volatility: p=0.0000
+Volume ->(0) Trading_Value: p=0.0000
+Volatility ->(0) High: p=0.0000
+Volatility ->(0) Low: p=0.0000
+Volatility ->(0) Trading_Value: p=0.0013
+Trading_Value ->(0) Volume: p=0.0000
+Trading_Value ->(0) Volatility: p=0.0013
+MA5 ->(0) Close: p=0.0000
+MA5 ->(1) MA10: p=0.0000
+MA10 ->(0) month: p=0.0486
+Intraday_Return ->(0) Open: p=0.0000
+Intraday_Return ->(4) Daily Return: p=0.0443
+MACD ->(0) Daily Return: p=0.0000
+Daily Return ->(0) MACD: p=0.0000
