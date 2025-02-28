@@ -23,12 +23,8 @@ class Net(nn.Module):
                           bias=True,
                           batch_first=False,
                           dropout=params.lstm_dropout)
-
         
-        # Add simple attention mechanism
-        self.attention = nn.Linear(params.lstm_hidden_dim, 1)
-        
-        # 添加残差连接
+        # add residual connection 
         self.skip_connection = nn.Linear(1+params.cov_dim+params.embedding_dim, 
                                        params.lstm_hidden_dim)
         
@@ -47,15 +43,11 @@ class Net(nn.Module):
         
         # 3. LSTM processing
         output, (hidden, cell) = self.lstm(lstm_input, (hidden, cell))
-        
-        # 4. Attention mechanism
-        attention_weights = torch.softmax(self.attention(output), dim=0)
-        attended_output = attention_weights * output
-        
-        # 5. Residual connection
+
+        # 4. Residual connection
         final_hidden = hidden + skip_connection[-1].unsqueeze(0).repeat(hidden.size(0), 1, 1)
-        
-        # 6. Calculate output
+
+        # 5. Calculate output
         hidden_permute = final_hidden.permute(1, 2, 0).contiguous().view(hidden.shape[1], -1)
         pre_sigma = self.distribution_presigma(hidden_permute)
         mu = self.distribution_mu(hidden_permute)
@@ -106,23 +98,6 @@ class Net(nn.Module):
                     x[self.params.predict_start + t + 1, :, 0] = mu_de
             return sample_mu, sample_sigma
 
-"""
-# original loss function
-def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
-    '''
-    Compute using gaussian the log-likehood which needs to be maximized. Ignore time steps where labels are missing.
-    Args:
-        mu: (Variable) dimension [batch_size] - estimated mean at time step t
-        sigma: (Variable) dimension [batch_size] - estimated standard deviation at time step t
-        labels: (Variable) dimension [batch_size] z_t
-    Returns:
-        loss: (Variable) average log-likelihood loss across the batch
-    '''
-    zero_index = (labels != 0)
-    distribution = torch.distributions.normal.Normal(mu[zero_index], sigma[zero_index])
-    likelihood = distribution.log_prob(labels[zero_index])
-    return -torch.mean(likelihood)
-"""
 # new loss: good capture at small fluctuation, but need improve accuracy
 def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
     '''Enhanced loss function focusing on matching exact fluctuation amplitudes'''
@@ -163,33 +138,8 @@ def loss_fn(mu: Variable, sigma: Variable, labels: Variable):
                  2.0 * direction_loss +        # 保持方向匹配
                  1.0 * frequency_loss +        # 确保捕捉到每个波动
                  2.0 * relative_loss)          # 确保波动幅度比例正确
-    
     return total_loss
 
-
-
-"""
-# original 
-# if relative is set to True, metrics are not normalized by the scale of labels
-def accuracy_ND(mu: torch.Tensor, labels: torch.Tensor, relative = False):
-    # debug start here
-    print("mu shape:", mu.shape)
-    print("labels shape:", labels.shape)
-    # Ensure labels matches mu's sequence length
-    seq_len = mu.shape[1]
-    labels = labels[:, :seq_len]
-    print("adjusted labels shape:", labels.shape)
-    # debug stop here
-    
-    zero_index = (labels != 0)
-    if relative:
-        diff = torch.mean(torch.abs(mu[zero_index] - labels[zero_index])).item()
-        return [diff, 1]
-    else:
-        diff = torch.sum(torch.abs(mu[zero_index] - labels[zero_index])).item()
-        summation = torch.sum(torch.abs(labels[zero_index])).item()
-        return [diff, summation]
-"""
 # new ND
 def accuracy_ND(mu: torch.Tensor, labels: torch.Tensor, relative = False):
     # Modified ND (Normalized Deviation) calculation for stock returns

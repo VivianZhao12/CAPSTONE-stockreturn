@@ -7,12 +7,14 @@ from datetime import datetime
 import pandas as pd
 import numpy as np
 from scipy import stats
+from statsmodels.tsa.stattools import grangercausalitytests
 from tigramite import data_processing as pp
 from tigramite import pcmci
 from tigramite.independence_tests import parcorr
 
+
 def generate_all_features(price_data):
-    """Generate all potential features for causality testing"""
+    """Generate all potential features for Granger causality testing"""
     features = pd.DataFrame(index=price_data.index)
     
     # Time-based features
@@ -51,8 +53,30 @@ def generate_all_features(price_data):
     
     return features
 
+# def run_granger_tests(data_frame, features_df):
+#     """Run Granger causality tests between features and Daily Return"""
+#     significant_features = []
+#     maxlag = 5
+   
+#     for col in features_df.columns:
+#         data = pd.DataFrame({
+#             'y': data_frame['Daily_Return'],
+#             'x': features_df[col]
+#         }).dropna()
+       
+#         result = grangercausalitytests(data, maxlag=maxlag, verbose=False)
+#         p_value = result[maxlag][0]['ssr_ftest'][1]
+        
+#         if p_value < 0.05:
+#             significant_features.append(col)
+#             print(f"{col}: p-value = {p_value:.4f} - Significant")
+#         else:
+#             print(f"{col}: p-value = {p_value:.4f}")
+           
+#     return significant_features
+
 def run_pcmci_test(data_frame, features_df):
-    data = pd.concat([features_df, data_frame['Daily Return']], axis=1)
+    data = pd.concat([features_df, data_frame['Daily_Return']], axis=1)
     data = data.ffill().fillna(0)
     data_array = data.values
     dataframe = pp.DataFrame(data_array, var_names=data.columns, datatime=data.index)
@@ -75,11 +99,11 @@ def run_pcmci_test(data_frame, features_df):
 
 if __name__ == '__main__':
     # Configuration
-    train_start = '2020-06-02'
-    train_end = '2023-09-25'
+    train_start = '2019-12-03'
+    train_end = '2023-09-30'
     
     # Load data
-    csv_path = '../data/stock/cvs_stock_wsenti.csv'
+    csv_path = '../Data/cvs_stock.csv'
     data_frame = pd.read_csv(csv_path, parse_dates=['Date'])
     data_frame.set_index('Date', inplace=True)
     
@@ -93,6 +117,12 @@ if __name__ == '__main__':
     # Generate features
     price_data = data_frame[['Open', 'Close', 'High', 'Low', 'Volume']]
     features_df = generate_all_features(price_data)
+    
+    # Run Granger tests
+    # print("\nRunning Granger causality tests...")
+    # significant_features = run_granger_tests(data_frame, features_df)
+    # print(f"\nNumber of significant features: {len(significant_features)}")
+    # print("Significant features:", significant_features)
     
     # Run PCMCI tests
     significant_relationships = run_pcmci_test(data_frame, features_df)
