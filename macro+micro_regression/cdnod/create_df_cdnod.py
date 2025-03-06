@@ -10,7 +10,7 @@ def create_df(features, ticker):
     return df[all_selected_features]
 
 if __name__ == "__main__":
-    # define tickers and either selected variables from cdnod.py
+    # define tickers and either selected variables from cdnod_feature_select.ipynb
     features = {'amzn':["M1SL","M2SL","INCOME_STATEMENT_operatingIncome","CASH_FLOW_cashflowFromInvestment","CASH_FLOW_capitalExpenditures","CASH_FLOW_operatingCashflow","CASH_FLOW_changeInOperatingLiabilities","BALANCE_SHEET_cashAndCashEquivalentsAtCarryingValue"],
                 'amgn':['CASH_FLOW_changeInOperatingAssets','BALANCE_SHEET_otherCurrentAssets', 'UNRATE','CASH_FLOW_operatingCashflow', 'BALANCE_SHEET_currentDebt'],
                 'goog':['INCOME_STATEMENT_incomeTaxExpense','INCOME_STATEMENT_otherNonOperatingIncome','M2SL','CPIAUCSL','CASH_FLOW_paymentsForRepurchaseOfCommonStock','UNRATE','PPIACO','M1SL','CASH_FLOW_cashflowFromFinancing'],
