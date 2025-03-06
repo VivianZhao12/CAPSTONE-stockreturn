@@ -34,3 +34,81 @@
 [12:03:26] DeepAR.Data: building datasets from data/goog_stock_processed...
 [12:03:26] DeepAR.Eval: - done.
 [12:03:26] DeepAR.Eval: Starting evaluation
+[13:42:37] DeepAR.Eval: Not using cuda...
+[13:42:37] DeepAR.Eval: Loading the datasets...
+[13:42:37] DeepAR.Data: test_len: 67
+[13:42:37] DeepAR.Data: building datasets from data/goog_stock_processed...
+[13:42:37] DeepAR.Eval: - done.
+[13:42:37] DeepAR.Eval: Starting evaluation
+[14:18:12] DeepAR.Eval: Not using cuda...
+[14:18:12] DeepAR.Eval: Loading the datasets...
+[14:18:12] DeepAR.Data: test_len: 67
+[14:18:12] DeepAR.Data: building datasets from data/goog_stock_processed...
+[14:18:12] DeepAR.Eval: - done.
+[14:18:12] DeepAR.Eval: Starting evaluation
+[14:19:35] DeepAR.Eval: - Full test metrics: ND: 1.655; RMSE: 1.800; test_loss: 3.196; rou90: 7.406; rou50: 17.692
+[14:19:36] DeepAR.Eval: Loading original stock data: ../data/stock/goog_stock_wsenti.csv
+[14:19:36] DeepAR.Eval: Evaluation with original data - MAE: 0.019281, RMSE: 0.025326, Direction Accuracy: 0.5370
+[14:19:36] DeepAR.Eval: Prediction date range: 2024-09-18 to 2025-02-24
+[14:19:36] DeepAR.Eval: Prediction results saved to: experiments/goog_base_model/deepar_predictions.csv
+[14:19:36] DeepAR.Eval: Prediction visualization chart saved to: experiments/goog_base_model/deepar_predictions_plot.png
+[14:19:36] DeepAR.Eval: Prediction generation complete. Summary statistics:
+[14:19:36] DeepAR.Eval: Number of samples: 67
+[14:19:36] DeepAR.Eval: Mean Absolute Error (MAE): 0.016819
+[14:19:36] DeepAR.Eval: Root Mean Square Error (RMSE): 0.021145
+[14:19:36] DeepAR.Eval: Direction Accuracy: 0.5373
+[14:19:36] DeepAR.Eval: Prediction data saved to: experiments/goog_base_model/predictions_data_epoch_10.json
+[14:23:56] DeepAR.Eval: Not using cuda...
+[14:23:56] DeepAR.Eval: Loading the datasets...
+[14:23:56] DeepAR.Data: test_len: 67
+[14:23:56] DeepAR.Data: building datasets from data/goog_stock_processed...
+[14:23:56] DeepAR.Eval: - done.
+[14:23:56] DeepAR.Eval: Starting evaluation
+[14:25:23] DeepAR.Eval: - Full test metrics: ND: 1.047; RMSE: 2.804; test_loss: 3.452; rou90: 12.272; rou50: 30.734
+[14:25:23] DeepAR.Eval: Loading original stock data: ../data/stock/goog_stock_wsenti.csv
+[14:25:23] DeepAR.Eval: Evaluation with original data - MAE: 0.029921, RMSE: 0.035144, Direction Accuracy: 0.5556
+[14:25:23] DeepAR.Eval: Prediction date range: 2024-09-18 to 2025-02-24
+[14:25:23] DeepAR.Eval: Prediction results saved to: experiments/goog_base_model/deepar_predictions.csv
+[14:25:24] DeepAR.Eval: Prediction visualization chart saved to: experiments/goog_base_model/deepar_predictions_plot.png
+[14:25:24] DeepAR.Eval: Prediction generation complete. Summary statistics:
+[14:25:24] DeepAR.Eval: Number of samples: 67
+[14:25:24] DeepAR.Eval: Mean Absolute Error (MAE): 0.028998
+[14:25:24] DeepAR.Eval: Root Mean Square Error (RMSE): 0.032922
+[14:25:24] DeepAR.Eval: Direction Accuracy: 0.6269
+[14:25:24] DeepAR.Eval: Prediction data saved to: experiments/goog_base_model/predictions_data_epoch_7.json
+[14:26:49] DeepAR.Eval: Not using cuda...
+[14:26:50] DeepAR.Eval: Loading the datasets...
+[14:26:50] DeepAR.Data: test_len: 67
+[14:26:50] DeepAR.Data: building datasets from data/goog_stock_processed...
+[14:26:50] DeepAR.Eval: - done.
+[14:26:50] DeepAR.Eval: Starting evaluation
+[14:28:14] DeepAR.Eval: - Full test metrics: ND: 1.127; RMSE: 2.629; test_loss: 3.927; rou90: 12.716; rou50: 29.965
+[14:28:14] DeepAR.Eval: Loading original stock data: ../data/stock/goog_stock_wsenti.csv
+[14:28:14] DeepAR.Eval: Evaluation with original data - MAE: 0.027782, RMSE: 0.032642, Direction Accuracy: 0.5926
+[14:28:14] DeepAR.Eval: Prediction date range: 2024-09-18 to 2025-02-24
+[14:28:14] DeepAR.Eval: Prediction results saved to: experiments/goog_base_model/deepar_predictions.csv
+[14:28:15] DeepAR.Eval: Prediction visualization chart saved to: experiments/goog_base_model/deepar_predictions_plot.png
+[14:28:15] DeepAR.Eval: Prediction generation complete. Summary statistics:
+[14:28:15] DeepAR.Eval: Number of samples: 67
+[14:28:15] DeepAR.Eval: Mean Absolute Error (MAE): 0.027592
+[14:28:15] DeepAR.Eval: Root Mean Square Error (RMSE): 0.031469
+[14:28:15] DeepAR.Eval: Direction Accuracy: 0.6269
+[14:28:15] DeepAR.Eval: Prediction data saved to: experiments/goog_base_model/predictions_data_epoch_14.json
+[14:28:46] DeepAR.Eval: Not using cuda...
+[14:28:46] DeepAR.Eval: Loading the datasets...
+[14:28:46] DeepAR.Data: test_len: 67
+[14:28:46] DeepAR.Data: building datasets from data/goog_stock_processed...
+[14:28:46] DeepAR.Eval: - done.
+[14:28:46] DeepAR.Eval: Starting evaluation
+[14:30:41] DeepAR.Eval: - Full test metrics: ND: 2.267; RMSE: 1.515; test_loss: 4.110; rou90: 8.089; rou50: 13.096
+[14:30:41] DeepAR.Eval: Loading original stock data: ../data/stock/goog_stock_wsenti.csv
+[14:30:41] DeepAR.Eval: Evaluation with original data - MAE: 0.016405, RMSE: 0.021819, Direction Accuracy: 0.5000
+[14:30:41] DeepAR.Eval: Prediction date range: 2024-09-18 to 2025-02-24
+[14:30:41] DeepAR.Eval: Prediction results saved to: experiments/goog_base_model/deepar_predictions.csv
+[14:30:41] DeepAR.Eval: Prediction visualization chart saved to: experiments/goog_base_model/deepar_predictions_plot.png
+[14:30:41] DeepAR.Eval: Prediction generation complete. Summary statistics:
+[14:30:41] DeepAR.Eval: Number of samples: 67
+[14:30:41] DeepAR.Eval: Mean Absolute Error (MAE): 0.014191
+[14:30:41] DeepAR.Eval: Root Mean Square Error (RMSE): 0.018644
+[14:30:41] DeepAR.Eval: Direction Accuracy: 0.4925
+[14:30:41] DeepAR.Eval: Prediction data saved to: experiments/goog_base_model/predictions_data_epoch_6.json

@@ -1,0 +1,88 @@
+2025-03-06 14:20:46,194 - INFO - 1. Loading data...
+2025-03-06 14:20:46,201 - INFO - 
+2. Merging quarterly data into daily data...
+2025-03-06 14:20:46,204 - INFO - 
+Data column preview:
+2025-03-06 14:20:46,205 - INFO - - Date
+2025-03-06 14:20:46,205 - INFO - - abs_error
+2025-03-06 14:20:46,205 - INFO - - actual
+2025-03-06 14:20:46,205 - INFO - - error
+2025-03-06 14:20:46,205 - INFO - - prediction
+2025-03-06 14:20:46,205 - INFO - 
+3. Creating fusion features...
+2025-03-06 14:20:46,221 - INFO - 
+4. Training fusion model...
+2025-03-06 14:20:46,432 - INFO - 
+5. Generating final predictions for historical data...
+2025-03-06 14:20:46,443 - INFO - 
+Fusion model average absolute error: 0.015380
+2025-03-06 14:20:46,443 - INFO - DeepAR model average absolute error: 0.020337
+2025-03-06 14:20:46,444 - INFO - Relative improvement: 24.37%
+2025-03-06 14:20:46,446 - INFO - 
+Results have been saved to DeepAR/experiments/goog_base_model/fusion_predictions.csv
+2025-03-06 14:25:43,009 - INFO - 1. Loading data...
+2025-03-06 14:25:43,017 - INFO - 
+2. Merging quarterly data into daily data...
+2025-03-06 14:25:43,021 - INFO - 
+Data column preview:
+2025-03-06 14:25:43,021 - INFO - - Date
+2025-03-06 14:25:43,021 - INFO - - abs_error
+2025-03-06 14:25:43,021 - INFO - - actual
+2025-03-06 14:25:43,021 - INFO - - error
+2025-03-06 14:25:43,021 - INFO - - prediction
+2025-03-06 14:25:43,021 - INFO - 
+3. Creating fusion features...
+2025-03-06 14:25:43,038 - INFO - 
+4. Training fusion model...
+2025-03-06 14:25:43,252 - INFO - 
+5. Generating final predictions for historical data...
+2025-03-06 14:25:43,265 - INFO - 
+Fusion model average absolute error: 0.019817
+2025-03-06 14:25:43,265 - INFO - DeepAR model average absolute error: 0.030321
+2025-03-06 14:25:43,265 - INFO - Relative improvement: 34.64%
+2025-03-06 14:25:43,268 - INFO - 
+Results have been saved to DeepAR/experiments/goog_base_model/fusion_predictions.csv
+2025-03-06 14:28:23,522 - INFO - 1. Loading data...
+2025-03-06 14:28:23,530 - INFO - 
+2. Merging quarterly data into daily data...
+2025-03-06 14:28:23,534 - INFO - 
+Data column preview:
+2025-03-06 14:28:23,534 - INFO - - Date
+2025-03-06 14:28:23,534 - INFO - - abs_error
+2025-03-06 14:28:23,534 - INFO - - actual
+2025-03-06 14:28:23,534 - INFO - - error
+2025-03-06 14:28:23,534 - INFO - - prediction
+2025-03-06 14:28:23,534 - INFO - 
+3. Creating fusion features...
+2025-03-06 14:28:23,550 - INFO - 
+4. Training fusion model...
+2025-03-06 14:28:23,785 - INFO - 
+5. Generating final predictions for historical data...
+2025-03-06 14:28:23,798 - INFO - 
+Fusion model average absolute error: 0.017218
+2025-03-06 14:28:23,798 - INFO - DeepAR model average absolute error: 0.028270
+2025-03-06 14:28:23,798 - INFO - Relative improvement: 39.09%
+2025-03-06 14:28:23,802 - INFO - 
+Results have been saved to DeepAR/experiments/goog_base_model/fusion_predictions.csv
+2025-03-06 14:30:48,780 - INFO - 1. Loading data...
+2025-03-06 14:30:48,788 - INFO - 
+2. Merging quarterly data into daily data...
+2025-03-06 14:30:48,792 - INFO - 
+Data column preview:
+2025-03-06 14:30:48,792 - INFO - - Date
+2025-03-06 14:30:48,792 - INFO - - abs_error
+2025-03-06 14:30:48,792 - INFO - - actual
+2025-03-06 14:30:48,792 - INFO - - error
+2025-03-06 14:30:48,792 - INFO - - prediction
+2025-03-06 14:30:48,792 - INFO - 
+3. Creating fusion features...
+2025-03-06 14:30:48,809 - INFO - 
+4. Training fusion model...
+2025-03-06 14:30:49,025 - INFO - 
+5. Generating final predictions for historical data...
+2025-03-06 14:30:49,038 - INFO - 
+Fusion model average absolute error: 0.014655
+2025-03-06 14:30:49,038 - INFO - DeepAR model average absolute error: 0.016537
+2025-03-06 14:30:49,038 - INFO - Relative improvement: 11.38%
+2025-03-06 14:30:49,041 - INFO - 
+Results have been saved to DeepAR/experiments/goog_base_model/fusion_predictions.csv
