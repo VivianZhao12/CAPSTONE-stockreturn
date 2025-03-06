@@ -7,15 +7,38 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import argparse
 import os
+import logging
+from datetime import timedelta
 
+def setup_logging(log_file):
+    """Set up logging to both console and file"""
+    # Create logger
+    logger = logging.getLogger()
+    logger.setLevel(logging.INFO)
+    
+    # Create formatter
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    
+    # Create file handler
+    file_handler = logging.FileHandler(log_file)
+    file_handler.setFormatter(formatter)
+    logger.addHandler(file_handler)
+    
+    # Create console handler
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(formatter)
+    logger.addHandler(console_handler)
+    
+    return logger
+    
 class FusionLayer:
     def __init__(self, model_type='rf', lookback_days=7):
         """
-        初始化融合层
+        Initialize the fusion layer
         
-        参数:
-        model_type: 融合模型类型 ('rf' 随机森林, 可以扩展其他模型)
-        lookback_days: 使用多少天的历史预测作为特征
+        Parameters:
+        model_type: Fusion model type ('rf' for random forest, can be extended to other models)
+        lookback_days: How many days of historical predictions to use as features
         """
         self.model_type = model_type
         self.lookback_days = lookback_days
@@ -24,85 +47,85 @@ class FusionLayer:
         
     def load_data(self, daily_predictions_path, quarterly_data_path):
         """
-        加载每日预测和季度数据
+        Load daily predictions and quarterly data
         """
         try:
-            # 加载数据
-            print(f"尝试加载文件: {daily_predictions_path}")
+            # Load data
+            print(f"Attempting to load file: {daily_predictions_path}")
             self.daily_df = pd.read_csv(daily_predictions_path)
-            print(f"尝试加载文件: {quarterly_data_path}")
+            print(f"Attempting to load file: {quarterly_data_path}")
             self.quarterly_df = pd.read_csv(quarterly_data_path)
             
-            # 确保日期列是datetime格式
+            # Ensure date columns are in datetime format
             self.daily_df['Date'] = pd.to_datetime(self.daily_df['Date'])
             self.quarterly_df['fiscalDateEnding'] = pd.to_datetime(self.quarterly_df['fiscalDateEnding'])
             
-            # 按日期排序
+            # Sort by date
             self.daily_df = self.daily_df.sort_values('Date')
             self.quarterly_df = self.quarterly_df.sort_values('fiscalDateEnding')
             
-            print(f"加载了 {len(self.daily_df)} 条每日预测数据")
-            print(f"加载了 {len(self.quarterly_df)} 条季度数据")
+            print(f"Loaded {len(self.daily_df)} daily prediction records")
+            print(f"Loaded {len(self.quarterly_df)} quarterly data records")
         except FileNotFoundError as e:
-            print(f"错误: 找不到文件 - {e}")
-            print(f"当前工作目录: {os.getcwd()}")
-            print("请检查文件路径是否正确，或使用绝对路径。")
+            print(f"Error: File not found - {e}")
+            print(f"Current working directory: {os.getcwd()}")
+            print("Please check if the file path is correct, or use absolute paths.")
             raise
         except Exception as e:
-            print(f"加载数据时出错: {e}")
+            print(f"Error loading data: {e}")
             raise
         
     def merge_quarterly_to_daily(self):
         """
-        将季度数据映射到每日数据
-        使用前向填充方法，每个日期使用最近的可用季度数据
+        Map quarterly data to daily data
+        Using forward fill method, each date uses the most recent available quarterly data
         """
-        # 创建日期范围从daily_df的最早日期到最晚日期
+        # Create date range from the earliest to the latest date in daily_df
         date_range = pd.date_range(start=self.daily_df['Date'].min(), 
                                    end=self.daily_df['Date'].max())
         date_df = pd.DataFrame({'Date': date_range})
         
-        # 将季度数据重命名为方便合并
+        # Rename quarterly data for easier merging
         quarterly_renamed = self.quarterly_df.rename(columns={
             'fiscalDateEnding': 'Date'
         })
         
-        # 将季度数据与日期范围合并
+        # Merge quarterly data with date range
         merged_df = pd.merge_asof(date_df.sort_values('Date'), 
                                   quarterly_renamed.sort_values('Date'),
                                   on='Date', 
                                   direction='backward')
         
-        # 将季度数据与每日预测合并
+        # Merge quarterly data with daily predictions
         self.merged_df = pd.merge(self.daily_df, merged_df, on='Date', how='left')
-        print(f"合并后的数据有 {len(self.merged_df)} 行，{self.merged_df.shape[1]} 列")
-        
+        print(f"The merged data has {len(self.merged_df)} rows and {self.merged_df.shape[1]} columns")
+
     def create_features(self):
         """
-        创建用于融合模型的特征
-        包括:
-        1. 原始DeepAR预测
-        2. 滚动平均预测误差
-        3. 最近的宏观/微观指标
-        4. 时间特征 (季节性, 趋势等)
-        5. 预测的历史表现
+        Create features for the fusion model
+        Including:
+        1. Original DeepAR predictions
+        2. Rolling average prediction errors
+        3. Recent macro/micro indicators
+        4. Time features (seasonality, trends, etc.)
+        5. Historical performance of predictions
         """
         df = self.merged_df.copy()
         
-        # 创建时间特征
+        # Create time features
         df['day_of_week'] = df['Date'].dt.dayofweek
         df['month'] = df['Date'].dt.month
         df['quarter'] = df['Date'].dt.quarter
-
-        # 添加波动性特征
+    
+        # Add volatility features
         df['recent_volatility'] = df['prediction'].rolling(window=10).std()
         
-        # 创建滚动特征
+        # Create rolling features
         for window in [3, 7, 14]:
-            # 滚动平均预测
+            # Rolling average prediction
             df[f'prediction_rolling_{window}d'] = df['prediction'].rolling(window=window).mean()
             
-            # 滚动平均误差
+            # Rolling average error
             if 'error' in df.columns:
                 df[f'error_rolling_{window}d'] = df['error'].rolling(window=window).mean()
                 df[f'abs_error_rolling_{window}d'] = df['abs_error'].rolling(window=window).mean()
@@ -110,33 +133,33 @@ class FusionLayer:
                 df[f'error_rolling_{window}d'] = 0
                 df[f'abs_error_rolling_{window}d'] = 0
         
-        # 使用正确的列名计算财务比率
-        # 检查列是否存在
+        # Calculate financial ratios using the correct column names
+        # Check if columns exist
         revenue_col = 'INCOME_STATEMENT_totalRevenue'
         profit_col = 'INCOME_STATEMENT_grossProfit'
         cost_col = 'INCOME_STATEMENT_costOfRevenue'
         
         if revenue_col in df.columns and profit_col in df.columns:
-            # 计算季度收入和利润的同比增长率
+            # Calculate year-over-year growth rates for quarterly revenue and profit
             df['revenue_yoy_growth'] = df.groupby(['quarter'])[revenue_col].pct_change(4)
             df['profit_yoy_growth'] = df.groupby(['quarter'])[profit_col].pct_change(4)
             
-            # 计算利润率
+            # Calculate profit margin
             df['profit_margin'] = df[profit_col] / df[revenue_col]
             
             if cost_col in df.columns:
-                # 尝试提取财务数据相对数量级，处理大数字
+                # Try to extract relative magnitude of financial data, handling large numbers
                 df['revenue_to_cost_ratio'] = df[revenue_col] / df[cost_col]
         
-        # 添加宏观经济指标（如果存在）
+        # Add macroeconomic indicators (if they exist)
         macro_cols = ['GDP', 'FEDFUNDS', 'UNRATE', 'CPIAUCSL']
         for col in macro_cols:
             if col in df.columns:
-                # 创建一些简单的派生特征
+                # Create some simple derived features
                 df[f'{col}_lag1'] = df[col].shift(1)
                 df[f'{col}_change'] = df[col].pct_change()
         
-        # 添加滞后特征 - 过去几天的预测和误差
+        # Add lagged features - predictions and errors from past days
         for lag in range(1, self.lookback_days+1):
             df[f'prediction_lag_{lag}'] = df['prediction'].shift(lag)
             if 'error' in df.columns:
@@ -144,28 +167,28 @@ class FusionLayer:
             else:
                 df[f'error_lag_{lag}'] = 0
         
-        # 检查缺失值
-        print(f"特征工程前数据有 {len(df)} 行")
+        # Check for missing values
+        print(f"Data has {len(df)} rows before feature engineering")
         
-        # 打印缺失值比例最高的列
+        # Print columns with highest missing value ratios
         na_ratio = df.isna().mean().sort_values(ascending=False)
-        print("\n缺失值比例最高的10个列:")
+        print("\nTop 10 columns with highest missing value ratios:")
         print(na_ratio.head(10))
         
-        # 先尝试填充滚动特征和滞后特征中的缺失值
+        # First try to fill missing values in rolling features and lagged features
         for window in [3, 7, 14]:
             df[f'prediction_rolling_{window}d'] = df[f'prediction_rolling_{window}d'].fillna(df['prediction'])
             if 'error' in df.columns:
                 df[f'error_rolling_{window}d'] = df[f'error_rolling_{window}d'].fillna(0)
                 df[f'abs_error_rolling_{window}d'] = df[f'abs_error_rolling_{window}d'].fillna(0)
                 
-        # 填充滞后特征
+        # Fill lagged features
         for lag in range(1, self.lookback_days+1):
             df[f'prediction_lag_{lag}'] = df[f'prediction_lag_{lag}'].fillna(df['prediction'])
             if 'error' in df.columns:
                 df[f'error_lag_{lag}'] = df[f'error_lag_{lag}'].fillna(0)
         
-        # 对财务和宏观数据的缺失值使用向前填充
+        # Use forward fill for missing values in financial and macro data
         finance_cols = [col for col in df.columns if 'INCOME_STATEMENT_' in col or 'BALANCE_SHEET_' in col or 'CASH_FLOW_' in col]
         macro_cols = ['GDP', 'FEDFUNDS', 'UNRATE', 'CPIAUCSL', 'M2SL', 'M1SL', 'PPIACO', 'RTWEXBGS']
         fill_forward_cols = finance_cols + macro_cols
@@ -174,29 +197,29 @@ class FusionLayer:
             if col in df.columns:
                 df[col] = df[col].ffill()
         
-        # 删除任何仍然包含NaN值的行
+        # Remove any rows that still contain NaN values
         self.feature_df = df.dropna()
-        print(f"\n特征工程后剩余 {len(self.feature_df)} 行数据")
+        print(f"\nRemaining {len(self.feature_df)} rows of data after feature engineering")
         
-        # 如果没有足够的数据，尝试更激进的缺失值处理
-        if len(self.feature_df) < 30:  # 至少需要30行进行训练
-            print("数据行数不足，尝试更激进的缺失值处理...")
-            # 计算列的缺失率
+        # If there isn't enough data, try more aggressive missing value handling
+        if len(self.feature_df) < 30:  # Need at least 30 rows for training
+            print("Insufficient data rows, trying more aggressive missing value handling...")
+            # Calculate column missing ratios
             missing_ratio = df.isna().mean()
             
-            # 删除缺失率超过50%的列
+            # Drop columns with missing rate over 50%
             cols_to_drop = missing_ratio[missing_ratio > 0.5].index.tolist()
-            print(f"删除以下高缺失率列: {cols_to_drop}")
+            print(f"Dropping the following high-missing-rate columns: {cols_to_drop}")
             df_reduced = df.drop(columns=cols_to_drop)
             
-            # 对数值列使用0填充，对非数值列使用众数填充
+            # Use 0 for numeric columns, mode for non-numeric columns
             numeric_cols = df_reduced.select_dtypes(include=['float64', 'int64']).columns
             for col in numeric_cols:
                 df_reduced[col] = df_reduced[col].fillna(0)
                 
             categorical_cols = df_reduced.select_dtypes(exclude=['float64', 'int64']).columns
             for col in categorical_cols:
-                if col != 'Date':  # 不处理日期列
+                if col != 'Date':  # Don't process date columns
                     try:
                         mode_value = df_reduced[col].mode()[0]
                         df_reduced[col] = df_reduced[col].fillna(mode_value)
@@ -204,97 +227,97 @@ class FusionLayer:
                         pass
             
             self.feature_df = df_reduced
-            print(f"更激进的处理后剩余 {len(self.feature_df)} 行数据")
+            print(f"Remaining {len(self.feature_df)} rows of data after aggressive processing")
             
-        # 如果仍然没有足够的数据，使用非常激进的方法
+        # If still not enough data, use very aggressive methods
         if len(self.feature_df) < 30:
-            print("数据仍然不足，使用最小特征集...")
+            print("Data still insufficient, using minimum feature set...")
             min_features_df = df[['Date', 'prediction', 'day_of_week', 'month', 'quarter']].copy()
             
             if 'actual' in df.columns:
                 min_features_df['actual'] = df['actual']
                 
-            # 如果有其他关键特征，添加它们
+            # If there are other key features, add them
             for col in ['GDP', 'UNRATE']:
                 if col in df.columns:
                     min_features_df[col] = df[col].fillna(df[col].median())
                     
             self.feature_df = min_features_df.dropna()
-            print(f"最小特征集后剩余 {len(self.feature_df)} 行数据")
-        
+            print(f"Remaining {len(self.feature_df)} rows of data after minimum feature set")
+
     def train_model(self, test_size=0.2):
         """
-        训练融合模型
+        Train the fusion model
         """
         if len(self.feature_df) == 0:
-            raise ValueError("没有足够的数据进行训练，请检查数据处理步骤")
+            raise ValueError("Not enough data for training, please check data processing steps")
             
-        # 确保数据集大小足够进行分割
+        # Ensure the dataset is large enough to split
         if len(self.feature_df) < 5:
-            print("警告：数据集太小，无法分割。使用全部数据训练。")
+            print("Warning: Dataset too small to split. Using all data for training.")
             test_size = 0
             
-        # 定义特征和目标列
+        # Define feature and target columns
         exclude_cols = [
             'Date', 'actual', 'error', 'abs_error', 'correct_direction', 
             'Ticker', 'fiscalDateEnding', 'observation_date'
         ]
         
-        # 确保'actual'列存在
+        # Ensure 'actual' column exists
         if 'actual' not in self.feature_df.columns:
-            raise ValueError("数据中缺少'actual'列，无法训练模型")
+            raise ValueError("Missing 'actual' column in the data, cannot train the model")
             
-        # 动态确定特征列
+        # Dynamically determine feature columns
         features = [col for col in self.feature_df.columns if col not in exclude_cols]
         
         X = self.feature_df[features]
         y = self.feature_df['actual']
         
-        # 处理可能的特征问题
-        # 删除所有值都相同的列（这些列没有信息）
+        # Handle potential feature issues
+        # Remove columns where all values are the same (no information)
         constant_cols = [col for col in X.columns if X[col].nunique() == 1]
         if constant_cols:
-            print(f"删除以下常数列: {constant_cols}")
+            print(f"Removing the following constant columns: {constant_cols}")
             X = X.drop(columns=constant_cols)
             
-        # 检查是否还有特征
+        # Check if there are still features available
         if X.shape[1] == 0:
-            raise ValueError("处理后没有可用特征")
+            raise ValueError("No features available after processing")
             
-        # 分割训练和测试集（如果测试集大小大于0）
+        # Split into training and test sets (if test size is greater than 0)
         if test_size > 0:
             X_train, X_test, y_train, y_test = train_test_split(
                 X, y, test_size=test_size, shuffle=False
             )
         else:
             X_train, y_train = X, y
-            X_test, y_test = X.iloc[:1], y.iloc[:1]  # 创建一个最小的测试集
+            X_test, y_test = X.iloc[:1], y.iloc[:1]  # Create a minimal test set
         
-        # 标准化数值特征
+        # Standardize numeric features
         numeric_features = X_train.select_dtypes(include=['float64', 'int64']).columns
         self.scaler.fit(X_train[numeric_features])
         X_train[numeric_features] = self.scaler.transform(X_train[numeric_features])
         X_test[numeric_features] = self.scaler.transform(X_test[numeric_features])
         
-        # 保存使用的特征列表，以便在预测时使用相同的特征
+        # Save the list of features used, for use in prediction
         self.used_features = X_train.columns.tolist()
         
-        # 初始化和训练模型
+        # Initialize and train model
         
-        # 标准化数值特征
+        # Standardize numeric features
         numeric_features = X.select_dtypes(include=['float64', 'int64']).columns
         self.scaler.fit(X_train[numeric_features])
         X_train[numeric_features] = self.scaler.transform(X_train[numeric_features])
         X_test[numeric_features] = self.scaler.transform(X_test[numeric_features])
         
-        # 初始化和训练模型
+        # Initialize and train model
         if self.model_type == 'rf':
             self.model = RandomForestRegressor(n_estimators=100, random_state=42)
-        # 可以添加其他模型类型
+        # Can add other model types
         
         self.model.fit(X_train, y_train)
         
-        # 评估模型
+        # Evaluate model
         train_preds = self.model.predict(X_train)
         test_preds = self.model.predict(X_test)
         
@@ -304,21 +327,21 @@ class FusionLayer:
         train_mae = mean_absolute_error(y_train, train_preds)
         test_mae = mean_absolute_error(y_test, test_preds)
         
-        # 特征重要性
+        # Feature importance
         if self.model_type == 'rf':
             feature_importance = pd.DataFrame({
                 'feature': X_train.columns,
                 'importance': self.model.feature_importances_
             }).sort_values('importance', ascending=False)
-            print("\n特征重要性:")
+            print("\nFeature importance:")
             print(feature_importance.head(10))
         
-        print(f"\n训练集 RMSE: {train_rmse:.6f}")
-        print(f"测试集 RMSE: {test_rmse:.6f}")
-        print(f"训练集 MAE: {train_mae:.6f}")
-        print(f"测试集 MAE: {test_mae:.6f}")
+        print(f"\nTraining set RMSE: {train_rmse:.6f}")
+        print(f"Test set RMSE: {test_rmse:.6f}")
+        print(f"Training set MAE: {train_mae:.6f}")
+        print(f"Test set MAE: {test_mae:.6f}")
         
-        # 保存评估结果
+        # Save evaluation results
         self.evaluation = {
             'train_rmse': train_rmse,
             'test_rmse': test_rmse,
@@ -327,92 +350,92 @@ class FusionLayer:
         }
         
         return self.evaluation
-    
+
     def predict(self, new_data=None):
         """
-        使用训练好的模型进行预测，并与DeepAR预测融合
-        如果提供new_data，则使用它，否则使用训练数据
+        Use the trained model to make predictions, and fuse with DeepAR predictions
+        If new_data is provided, use it, otherwise use the training data
         """
-        # 存储训练时使用的特征
+        # Store features used during training
         if not hasattr(self, 'used_features'):
-            raise ValueError("模型尚未训练，无法获取使用的特征")
+            raise ValueError("Model not yet trained, cannot get used features")
             
         if new_data is not None:
-            # 确保所有训练特征在预测数据中可用
+            # Ensure all training features are available in the prediction data
             for feature in self.used_features:
                 if feature not in new_data.columns:
-                    print(f"警告: 缺少特征 '{feature}'，使用0填充")
+                    print(f"Warning: Missing feature '{feature}', filling with 0")
                     new_data[feature] = 0
                     
-            # 只使用训练时使用的特征
+            # Only use features that were used during training
             X = new_data[self.used_features]
-            # 获取原始DeepAR预测
+            # Get original DeepAR predictions
             deepar_predictions = new_data['prediction'].values
         else:
-            # 使用训练数据
+            # Use training data
             X = self.feature_df[self.used_features]
-            # 获取原始DeepAR预测
+            # Get original DeepAR predictions
             deepar_predictions = self.feature_df['prediction'].values
         
-        # 标准化数值特征
+        # Standardize numeric features
         numeric_features = X.select_dtypes(include=['float64', 'int64']).columns
         X[numeric_features] = self.scaler.transform(X[numeric_features])
         
-        # 获取融合模型的基础预测
+        # Get base predictions from the fusion model
         base_predictions = self.model.predict(X)
         
-        # 检测可能的波动性
+        # Detect potential volatility
         if 'recent_volatility' in X.columns:
             volatility = X['recent_volatility'].values
-            # 动态调整权重 - 高波动期间给DeepAR更多权重
-            alpha = np.ones_like(base_predictions) * 0.6  # 默认权重
+            # Dynamically adjust weights - give DeepAR more weight during high volatility periods
+            alpha = np.ones_like(base_predictions) * 0.6  # Default weight
             high_vol_mask = volatility > np.median(volatility)
-            alpha[high_vol_mask] = 0.4  # 高波动期间降低融合模型权重
+            alpha[high_vol_mask] = 0.4  # Reduce fusion model weight during high volatility
         else:
-            # 使用固定权重
+            # Use fixed weight
             alpha = 0.6
         
-        # 融合预测，保留更多DeepAR的波动性
+        # Fuse predictions, preserving more of DeepAR's volatility
         final_predictions = alpha * base_predictions + (1 - alpha) * deepar_predictions
         
         return final_predictions
-    
+
     def predict_future(self, future_dates_df, future_quarterly_data=None):
         """
-        预测未来时间段
+        Predict future time periods
         
-        参数:
-        future_dates_df: 包含未来日期和DeepAR预测的DataFrame
-        future_quarterly_data: 可选的未来季度数据
+        Parameters:
+        future_dates_df: DataFrame containing future dates and DeepAR predictions
+        future_quarterly_data: Optional future quarterly data
         
-        返回:
-        带有融合预测的DataFrame
+        Returns:
+        DataFrame with fusion predictions
         """
-        print("预测未来时间段...")
+        print("Predicting future time periods...")
         
-        # 合并未来的季度数据（如果有）
+        # Merge future quarterly data (if available)
         if future_quarterly_data is not None:
-            # 确保日期格式正确
+            # Ensure date format is correct
             future_quarterly_data['fiscalDateEnding'] = pd.to_datetime(future_quarterly_data['fiscalDateEnding'])
-            # 添加到现有季度数据
+            # Add to existing quarterly data
             combined_quarterly = pd.concat([self.quarterly_df, future_quarterly_data]).drop_duplicates()
-            # 更新季度数据
+            # Update quarterly data
             self.quarterly_df = combined_quarterly
         
-        # 为未来日期准备数据
+        # Prepare data for future dates
         future_df = future_dates_df.copy()
         future_df['Date'] = pd.to_datetime(future_df['Date'])
         
-        # 获取最新季度数据并前向填充
+        # Get latest quarterly data and forward fill
         latest_quarterly = self.quarterly_df.sort_values('fiscalDateEnding').iloc[-1:].copy()
         
-        # 预测下一个季度的财务数据
+        # Predict financial data for the next quarter
         next_quarter_pred = self.predict_next_quarters(num_quarters=4)
         
-        # 合并实际的季度数据和预测的季度数据
+        # Combine actual quarterly data and predicted quarterly data
         all_quarterly = pd.concat([self.quarterly_df, next_quarter_pred])
         
-        # 将季度数据映射到未来日期
+        # Map quarterly data to future dates
         quarterly_renamed = all_quarterly.rename(columns={'fiscalDateEnding': 'Date'})
         future_with_quarterly = pd.merge_asof(
             future_df.sort_values('Date'), 
@@ -421,13 +444,13 @@ class FusionLayer:
             direction='backward'
         )
         
-        # 创建特征
+        # Create features
         future_feature_df = self.prepare_future_features(future_with_quarterly)
         
-        # 确保所有需要的特征都存在
+        # Ensure all needed features exist
         if not hasattr(self, 'used_features'):
-            print("警告: 模型未保存使用的特征列表，尝试使用所有可用特征")
-            # 使用所有可能的特征
+            print("Warning: Model did not save the list of used features, attempting to use all available features")
+            # Use all possible features
             exclude_cols = [
                 'Date', 'actual', 'error', 'abs_error', 'correct_direction', 
                 'Ticker', 'fiscalDateEnding', 'observation_date'
@@ -436,67 +459,67 @@ class FusionLayer:
         else:
             features = self.used_features
             
-        # 确保所有需要的特征都存在
+        # Ensure all needed features exist
         for feature in features:
             if feature not in future_feature_df.columns:
-                print(f"添加缺失特征: {feature}")
+                print(f"Adding missing feature: {feature}")
                 future_feature_df[feature] = 0
         
-        # 使用训练好的模型预测
+        # Use trained model to predict
         X = future_feature_df[features]
         
-        # 标准化特征
+        # Standardize features
         numeric_features = X.select_dtypes(include=['float64', 'int64']).columns
         X[numeric_features] = self.scaler.transform(X[numeric_features])
         
-        # 预测
+        # Predict
         future_predictions = self.model.predict(X)
         
-        # 添加预测结果
+        # Add prediction results
         result_df = future_feature_df.copy()
         result_df['fusion_prediction'] = future_predictions
         
-        print(f"预测完成，共 {len(result_df)} 条预测")
+        print(f"Prediction complete, {len(result_df)} predictions made")
         
         return result_df
     
     def prepare_future_features(self, future_df):
         """
-        为未来数据准备特征
+        Prepare features for future data
         """
         df = future_df.copy()
         
-        # 创建时间特征
+        # Create time features
         df['day_of_week'] = df['Date'].dt.dayofweek
         df['month'] = df['Date'].dt.month
         df['quarter'] = df['Date'].dt.quarter
         
-        # 创建滚动特征
+        # Create rolling features
         for window in [3, 7, 14]:
-            # 滚动平均预测
+            # Rolling average prediction
             df[f'prediction_rolling_{window}d'] = df['prediction'].rolling(window=window).mean()
             
-            # 如果有历史数据，可以计算历史误差的滚动平均
+            # If historical data is available, calculate rolling average of historical errors
             if 'error' in df.columns:
                 df[f'error_rolling_{window}d'] = df['error'].rolling(window=window).mean()
                 df[f'abs_error_rolling_{window}d'] = df['abs_error'].rolling(window=window).mean()
             else:
-                # 否则使用0填充
+                # Otherwise fill with 0
                 df[f'error_rolling_{window}d'] = 0
                 df[f'abs_error_rolling_{window}d'] = 0
         
-        # 使用正确的列名计算财务比率
+        # Calculate financial ratios using the correct column names
         revenue_col = 'INCOME_STATEMENT_totalRevenue'
         profit_col = 'INCOME_STATEMENT_grossProfit'
         cost_col = 'INCOME_STATEMENT_costOfRevenue'
         
         if revenue_col in df.columns and profit_col in df.columns:
             try:
-                # 计算季度收入和利润的同比增长率
+                # Calculate year-over-year growth rates for quarterly revenue and profit
                 df['revenue_yoy_growth'] = df.groupby(['quarter'])[revenue_col].pct_change(4, fill_method=None)
                 df['profit_yoy_growth'] = df.groupby(['quarter'])[profit_col].pct_change(4, fill_method=None)
                 
-                # 移除异常值
+                # Remove outliers
                 df['revenue_yoy_growth'] = df['revenue_yoy_growth'].apply(
                     lambda x: x if (pd.notna(x) and abs(x) < 0.5) else 0
                 )
@@ -504,36 +527,36 @@ class FusionLayer:
                     lambda x: x if (pd.notna(x) and abs(x) < 0.5) else 0
                 )
                 
-                # 计算利润率
+                # Calculate profit margin
                 df['profit_margin'] = df.apply(
                     lambda row: row[profit_col] / row[revenue_col] if row[revenue_col] != 0 else 0, 
                     axis=1
                 )
                 
                 if cost_col in df.columns:
-                    # 尝试提取财务数据相对数量级
+                    # Try to extract relative magnitude of financial data
                     df['revenue_to_cost_ratio'] = df.apply(
                         lambda row: row[revenue_col] / row[cost_col] if row[cost_col] != 0 else 1, 
                         axis=1
                     )
             except Exception as e:
-                print(f"计算财务比率时出错：{e}")
-                # 如果计算失败，使用默认值
+                print(f"Error calculating financial ratios: {e}")
+                # If calculation fails, use default values
                 df['revenue_yoy_growth'] = 0
                 df['profit_yoy_growth'] = 0
                 df['profit_margin'] = 0
                 df['revenue_to_cost_ratio'] = 1
         
-        # 添加宏观经济指标（如果存在）
+        # Add macroeconomic indicators (if they exist)
         macro_cols = ['GDP', 'FEDFUNDS', 'UNRATE', 'CPIAUCSL']
         for col in macro_cols:
             if col in df.columns:
                 try:
-                    # 创建一些简单的派生特征
+                    # Create some simple derived features
                     df[f'{col}_lag1'] = df[col].shift(1)
                     df[f'{col}_change'] = df[col].pct_change(fill_method=None)
                     
-                    # 将NaN和无穷大替换为0
+                    # Replace NaN and infinity with 0
                     df[f'{col}_change'] = df[f'{col}_change'].apply(
                         lambda x: x if (pd.notna(x) and abs(x) < 0.5) else 0
                     )
@@ -541,7 +564,7 @@ class FusionLayer:
                     df[f'{col}_lag1'] = df[col]
                     df[f'{col}_change'] = 0
         
-        # 添加滞后特征 - 使用可用的最近历史数据
+        # Add lagged features - using available recent historical data
         for lag in range(1, self.lookback_days+1):
             df[f'prediction_lag_{lag}'] = df['prediction'].shift(lag)
             
@@ -550,9 +573,9 @@ class FusionLayer:
             else:
                 df[f'error_lag_{lag}'] = 0
         
-        # 对于未来预测的第一个日期，可能需要从历史数据获取滞后特征
-        # 这里简化处理，填充缺失值
-        # 对滚动和滞后特征进行填充
+        # For the first date of future predictions, lagged features may need to be obtained from historical data
+        # Simplified handling here, filling missing values
+        # Fill rolling and lagged features
         for window in [3, 7, 14]:
             df[f'prediction_rolling_{window}d'] = df[f'prediction_rolling_{window}d'].fillna(df['prediction'])
             df[f'error_rolling_{window}d'] = df[f'error_rolling_{window}d'].fillna(0)
@@ -562,14 +585,14 @@ class FusionLayer:
             df[f'prediction_lag_{lag}'] = df[f'prediction_lag_{lag}'].fillna(df['prediction'])
             df[f'error_lag_{lag}'] = df[f'error_lag_{lag}'].fillna(0)
             
-        # 对其他财务和宏观数据使用向前填充
+        # Use forward fill for other financial and macro data
         for col in df.columns:
             if col not in ['Date', 'prediction'] and df[col].isnull().any():
                 df[col] = df[col].ffill().bfill().fillna(0)
                 
-        # 最终检查：替换任何NaN或无穷大的值
+        # Final check: replace any NaN or infinity values
         for col in df.columns:
-            if col != 'Date':  # 不处理日期列
+            if col != 'Date':  # Don't process date column
                 try:
                     df[col] = df[col].replace([np.inf, -np.inf], 0)
                     df[col] = df[col].fillna(0)
@@ -580,116 +603,120 @@ class FusionLayer:
     
     def predict_next_quarters(self, num_quarters=4):
         """
-        预测未来几个季度的财务数据
-        简单方法：使用时序预测或平均增长率
+        Predict financial data for future quarters
+        Simple method: using time series prediction or average growth rate
         """
-        # 获取最近的季度数据
+        # Get recent quarterly data
         recent_quarters = self.quarterly_df.sort_values('fiscalDateEnding').tail(8)
         
-        # 计算平均季度增长率
+        # Calculate average quarterly growth rates
         growth_rates = {}
         for col in recent_quarters.columns:
             if col in ['Ticker', 'fiscalDateEnding', 'observation_date'] or 'reportedCurrency' in col:
                 continue
                 
-            # 只对数值列计算增长率
+            # Only calculate growth rates for numeric columns
             if recent_quarters[col].dtype in [np.float64, np.int64]:
                 try:
-                    # 计算季度环比增长率
+                    # Calculate quarter-over-quarter growth rates
                     pct_changes = recent_quarters[col].pct_change().dropna()
-                    # 取平均增长率
+                    # Take the average growth rate
                     if not pct_changes.empty:
                         growth_rates[col] = pct_changes.mean()
                 except:
-                    # 如果计算失败，设置为0
+                    # If calculation fails, set to 0
                     growth_rates[col] = 0
         
-        # 获取最新的季度数据
+        # Get the latest quarterly data
         last_quarter = recent_quarters.iloc[-1].copy()
         next_quarters = []
         
-        # 预测未来几个季度
+        # Predict future quarters
         for i in range(1, num_quarters+1):
-            # 复制上一季度数据
+            # Copy the previous quarter's data
             next_quarter = last_quarter.copy()
             
-            # 计算下一季度的日期
+            # Calculate date for next quarter
             next_date = pd.to_datetime(last_quarter['fiscalDateEnding']) + pd.DateOffset(months=3*i)
             next_quarter['fiscalDateEnding'] = next_date
             
-            # 更新财务指标，应用增长率
+            # Update financial metrics, applying growth rates
             for col, rate in growth_rates.items():
                 if pd.notna(last_quarter[col]) and last_quarter[col] != 0:
                     next_quarter[col] = last_quarter[col] * (1 + rate)
             
-            # 添加到预测季度列表
+            # Add to predicted quarters list
             next_quarters.append(next_quarter)
         
-        # 转换为DataFrame
+        # Convert to DataFrame
         next_quarters_df = pd.DataFrame(next_quarters)
         return next_quarters_df
+
     
     def run_pipeline(self, daily_predictions_path, quarterly_data_path, future_days=None, test_size=0.2):
         """
-        运行完整的融合模型流程
+        Run the complete fusion model pipeline
         
-        参数:
-        daily_predictions_path: 每日预测数据路径
-        quarterly_data_path: 季度数据路径
-        future_days: 如果提供，将预测未来的这些天数
-        test_size: 训练测试分割比例
+        Parameters:
+        daily_predictions_path: Path to daily prediction data
+        quarterly_data_path: Path to quarterly data
+        future_days: If provided, will predict for this many days in the future
+        test_size: Train-test split ratio
         """
-        print("1. 加载数据...")
+        # Get the logger
+        logger = logging.getLogger()
+        
+        logger.info("1. Loading data...")
         self.load_data(daily_predictions_path, quarterly_data_path)
         
-        print("\n2. 合并季度数据到每日数据...")
+        logger.info("\n2. Merging quarterly data into daily data...")
         self.merge_quarterly_to_daily()
         
-        # 检查合并后的数据列
-        print("\n数据列预览:")
+        # Check columns in the merged data
+        logger.info("\nData column preview:")
         for col in sorted(self.merged_df.columns):
             if 'Date' in col or 'prediction' in col or 'actual' in col or 'error' in col:
-                print(f"- {col}")
+                logger.info(f"- {col}")
                 
-        # 检查是否有必要的列
+        # Check if necessary columns exist
         required_cols = ['Date', 'prediction']
         for col in required_cols:
             if col not in self.merged_df.columns:
-                raise ValueError(f"缺少必要的列: {col}")
+                raise ValueError(f"Missing required column: {col}")
                 
-        print("\n3. 创建融合特征...")
+        logger.info("\n3. Creating fusion features...")
         self.create_features()
         
-        # 如果特征创建后行数为0，尝试基本特征
+        # If row count is 0 after feature creation, try basic features
         if len(self.feature_df) == 0:
-            print("警告: 特征工程后没有数据，尝试使用基本特征...")
+            logger.warning("Warning: No data after feature engineering, trying to use basic features...")
             df = self.merged_df.copy()
             
-            # 只保留基本特征
+            # Keep only basic features
             basic_cols = ['Date', 'prediction']
             
             if 'actual' in df.columns:
                 basic_cols.append('actual')
                 
-            # 添加时间特征
+            # Add time features
             df['day_of_week'] = df['Date'].dt.dayofweek
             df['month'] = df['Date'].dt.month
             df['quarter'] = df['Date'].dt.quarter
             
-            # 使用基本特征作为特征集
+            # Use basic features as the feature set
             self.feature_df = df[basic_cols + ['day_of_week', 'month', 'quarter']]
-            print(f"使用基本特征后的数据行数: {len(self.feature_df)}")
+            logger.info(f"Row count after using basic features: {len(self.feature_df)}")
         
-        print("\n4. 训练融合模型...")
+        logger.info("\n4. Training fusion model...")
         try:
             evaluation = self.train_model(test_size=test_size)
         except Exception as e:
-            print(f"训练模型失败: {e}")
-            # 使用简单的线性回归作为备选
-            print("尝试使用简单线性回归作为备选模型...")
+            logger.error(f"Model training failed: {e}")
+            # Use simple linear regression as a fallback
+            logger.info("Trying simple linear regression as a fallback model...")
             from sklearn.linear_model import LinearRegression
             
-            # 使用最基本的特征
+            # Use the most basic features
             basic_df = self.merged_df[['Date', 'prediction']].copy()
             basic_df['day_of_week'] = basic_df['Date'].dt.dayofweek
             basic_df['month'] = basic_df['Date'].dt.month
@@ -699,24 +726,24 @@ class FusionLayer:
                 
             self.feature_df = basic_df.dropna()
             
-            # 使用prediction作为唯一特征
+            # Use prediction as the only feature
             X = self.feature_df[['prediction', 'day_of_week', 'month']]
             y = self.feature_df['actual']
             
-            # 训练简单模型
+            # Train simple model
             self.model = LinearRegression()
             self.model.fit(X, y)
             self.model_type = 'linear'
             
-            # 简单评估
+            # Simple evaluation
             preds = self.model.predict(X)
             mse = mean_squared_error(y, preds)
-            print(f"简单线性模型MSE: {mse:.6f}")
+            logger.info(f"Simple linear model MSE: {mse:.6f}")
         
-        print("\n5. 生成历史数据的最终预测...")
+        logger.info("\n5. Generating final predictions for historical data...")
         final_predictions = self.predict()
         
-        # 将预测结果添加到原始数据中
+        # Add prediction results to original data
         result_df = self.feature_df.copy()
         result_df['fusion_prediction'] = final_predictions
         
@@ -728,39 +755,39 @@ class FusionLayer:
                 result_df['deepar_error'] = result_df['prediction'] - result_df['actual']
                 result_df['deepar_abs_error'] = np.abs(result_df['deepar_error'])
                 
-                # 计算融合模型相对于DeepAR的改进
+                # Calculate improvement of fusion model over DeepAR
                 avg_deepar_error = result_df['deepar_abs_error'].mean()
                 avg_fusion_error = result_df['fusion_abs_error'].mean()
                 improvement = (avg_deepar_error - avg_fusion_error) / avg_deepar_error * 100
                 
-                print(f"\n融合模型平均绝对误差: {avg_fusion_error:.6f}")
-                print(f"DeepAR模型平均绝对误差: {avg_deepar_error:.6f}")
-                print(f"相对改进: {improvement:.2f}%")
+                logger.info(f"\nFusion model average absolute error: {avg_fusion_error:.6f}")
+                logger.info(f"DeepAR model average absolute error: {avg_deepar_error:.6f}")
+                logger.info(f"Relative improvement: {improvement:.2f}%")
         
-        # 只保留Date和fusion_prediction列
+        # Keep only Date and fusion_prediction columns
         output_df = result_df[['Date', 'fusion_prediction', 'actual']].copy()
         
-        # 如果需要预测未来
+        # If future prediction is needed
         if future_days is not None:
-            print("\n6. 生成未来预测...")
-            # 创建未来日期
+            logger.info("\n6. Generating future predictions...")
+            # Create future dates
             last_date = self.daily_df['Date'].max()
             future_dates = [last_date + timedelta(days=i+1) for i in range(future_days)]
             
-            # 创建未来数据框架
-            # 这里假设DeepAR模型已经为这些日期生成了预测
-            # 如果没有，则使用最后一个预测值作为占位符
+            # Create future dataframe
+            # This assumes that the DeepAR model has already generated predictions for these dates
+            # If not, use the last prediction value as a placeholder
             last_prediction = self.daily_df['prediction'].iloc[-1]
             future_df = pd.DataFrame({
                 'Date': future_dates,
-                'prediction': [last_prediction] * future_days  # 占位符预测值
+                'prediction': [last_prediction] * future_days  # Placeholder prediction value
             })
             
-            # 预测未来
+            # Predict future
             future_predictions = self.predict_future(future_df)
             future_output = future_predictions[['Date', 'fusion_prediction', 'actual']].copy()
             
-            # 合并历史和未来预测
+            # Merge historical and future predictions
             all_results = pd.concat([output_df, future_output])
             return all_results
         
@@ -778,19 +805,12 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
     
-    # 打印参数
-    print("运行参数:")
-    print(f"每日预测数据: {args.daily}")
-    print(f"季度数据: {args.quarterly}")
-    print(f"预测未来天数: {args.future}")
-    print(f"输出文件: {args.output}")
-    print(f"特征历史天数: {args.lookback}")
-    print(f"测试集比例: {args.test_size}")
+    output_dir = os.path.dirname(args.daily)
+    log_file = os.path.join(output_dir, 'fusion_predictions.log')
+    setup_logging(log_file)
     
-    # 创建融合层实例
     fusion = FusionLayer(lookback_days=args.lookback)
     
-    # 运行完整流程
     results = fusion.run_pipeline(
         daily_predictions_path=args.daily,
         quarterly_data_path=args.quarterly,
@@ -798,11 +818,7 @@ if __name__ == "__main__":
         test_size=args.test_size
     )
     
-    # 从daily路径中提取目录部分
-    output_dir = os.path.dirname(args.daily)
-    
-    # 将输出文件放在与daily相同的目录中
     output_file = os.path.join(output_dir, args.output)
     
     results.to_csv(output_file, index=False)
-    print(f"\n结果已保存到 {output_file}")
+    logging.info(f"\nResults have been saved to {output_file}")

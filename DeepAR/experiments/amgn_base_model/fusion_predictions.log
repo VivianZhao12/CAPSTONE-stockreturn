@@ -1,0 +1,22 @@
+2025-03-06 05:15:27,873 - INFO - 1. Loading data...
+2025-03-06 05:15:27,883 - INFO - 
+2. Merging quarterly data into daily data...
+2025-03-06 05:15:27,888 - INFO - 
+Data column preview:
+2025-03-06 05:15:27,888 - INFO - - Date
+2025-03-06 05:15:27,889 - INFO - - abs_error
+2025-03-06 05:15:27,889 - INFO - - actual
+2025-03-06 05:15:27,889 - INFO - - error
+2025-03-06 05:15:27,889 - INFO - - prediction
+2025-03-06 05:15:27,889 - INFO - 
+3. Creating fusion features...
+2025-03-06 05:15:27,911 - INFO - 
+4. Training fusion model...
+2025-03-06 05:15:28,169 - INFO - 
+5. Generating final predictions for historical data...
+2025-03-06 05:15:28,182 - INFO - 
+Fusion model average absolute error: 0.025251
+2025-03-06 05:15:28,183 - INFO - DeepAR model average absolute error: 0.046768
+2025-03-06 05:15:28,183 - INFO - Relative improvement: 46.01%
+2025-03-06 05:15:28,186 - INFO - 
+Results have been saved to DeepAR/experiments/amgn_base_model/fusion_predictions.csv
