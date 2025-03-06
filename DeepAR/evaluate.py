@@ -18,9 +18,9 @@ import matplotlib.pyplot as plt
 logger = logging.getLogger('DeepAR.Eval')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default='cvs_stock_processed', help='Name of the dataset')
+parser.add_argument('--dataset', default='elect', help='Name of the dataset')
 parser.add_argument('--data-folder', default='data', help='Parent dir of the dataset')
-parser.add_argument('--model-name', default='cvs_base_model', help='Directory containing params.json')
+parser.add_argument('--model-name', default='base_model', help='Directory containing params.json')
 parser.add_argument('--relative-metrics', action='store_true', help='Whether to normalize the metrics by label scales')
 parser.add_argument('--sampling', action='store_true', help='Whether to sample during evaluation')
 parser.add_argument('--restore-file', default='best',
@@ -40,20 +40,16 @@ def evaluate(model, loss_fn, test_loader, params, plot_num, sample=True):
     '''
     model.eval()
     with torch.no_grad():
-      """
-      original content
       plot_batch = np.random.randint(len(test_loader)-1)
-      """
-      n_batches = len(test_loader)
-      if n_batches <= 1:
-          plot_batch = 0
-      else:
-          plot_batch = np.random.randint(n_batches-1)
 
       summary_metric = {}
       raw_metrics = utils.init_metrics(sample=sample)
-      
-      
+
+      # Test_loader: 
+      # test_batch ([batch_size, train_window, 1+cov_dim]): z_{0:T-1} + x_{1:T}, note that z_0 = 0;
+      # id_batch ([batch_size]): one integer denoting the time series id;
+      # v ([batch_size, 2]): scaling factor for each window;
+      # labels ([batch_size, train_window]): z_{1:T}.
       for i, (test_batch, id_batch, v, labels) in enumerate(tqdm(test_loader)):
           test_batch = test_batch.permute(1, 0, 2).to(torch.float32).to(params.device)
           id_batch = id_batch.unsqueeze(0).to(params.device)
