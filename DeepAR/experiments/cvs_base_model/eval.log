@@ -7,3 +7,175 @@
 [12:37:36] DeepAR.Eval: - done.
 [12:37:36] DeepAR.Eval: Starting evaluation
 [12:37:44] DeepAR.Eval: - Full test metrics: ND: 1.008; RMSE: 5.639; test_loss: 5.206
+[21:40:11] DeepAR.Eval: Not using cuda...
+[21:40:11] DeepAR.Eval: Loading the datasets...
+[21:40:11] DeepAR.Data: test_len: 67
+[21:40:11] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[21:40:11] DeepAR.Eval: - done.
+[21:40:11] DeepAR.Eval: Starting evaluation
+[21:40:19] DeepAR.Eval: - Full test metrics: ND: 4.269; RMSE: 2.257; test_loss: 4.867
+[21:43:42] DeepAR.Eval: Not using cuda...
+[21:43:42] DeepAR.Eval: Loading the datasets...
+[21:43:42] DeepAR.Data: test_len: 67
+[21:43:42] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[21:43:42] DeepAR.Eval: - done.
+[21:43:42] DeepAR.Eval: Starting evaluation
+[21:43:51] DeepAR.Eval: - Full test metrics: ND: 4.870; RMSE: 2.257; test_loss: 4.591
+[21:43:51] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/cvs_predictions.csv
+[21:43:51] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/cvs_predictions_plot.png
+[21:43:51] DeepAR.Eval: 预测生成完成。摘要统计:
+[21:43:51] DeepAR.Eval: 样本数: 67
+[21:43:51] DeepAR.Eval: 平均绝对误差 (MAE): 0.024869
+[21:43:51] DeepAR.Eval: 均方根误差 (RMSE): 0.029612
+[21:43:51] DeepAR.Eval: 方向准确率: 0.5672
+[21:44:59] DeepAR.Eval: Not using cuda...
+[21:44:59] DeepAR.Eval: Loading the datasets...
+[21:44:59] DeepAR.Data: test_len: 67
+[21:44:59] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[21:44:59] DeepAR.Eval: - done.
+[21:44:59] DeepAR.Eval: Starting evaluation
+[21:45:08] DeepAR.Eval: - Full test metrics: ND: 2.542; RMSE: 2.257; test_loss: 4.484
+[21:45:09] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/cvs_predictions.csv
+[21:45:09] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/cvs_predictions_plot.png
+[21:45:09] DeepAR.Eval: 预测生成完成。摘要统计:
+[21:45:09] DeepAR.Eval: 样本数: 67
+[21:45:09] DeepAR.Eval: 平均绝对误差 (MAE): 0.024869
+[21:45:09] DeepAR.Eval: 均方根误差 (RMSE): 0.029612
+[21:45:09] DeepAR.Eval: 方向准确率: 0.5672
+[21:45:09] DeepAR.Eval: 已将预测数据保存到: experiments/cvs_base_model/predictions_data_epoch_14.json
+[21:50:16] DeepAR.Eval: Not using cuda...
+[21:50:16] DeepAR.Eval: Loading the datasets...
+[21:50:16] DeepAR.Data: test_len: 67
+[21:50:16] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[21:50:16] DeepAR.Eval: - done.
+[21:50:16] DeepAR.Eval: Starting evaluation
+[21:50:26] DeepAR.Eval: - Full test metrics: ND: 1.004; RMSE: 5.639; test_loss: 5.077
+[21:50:26] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/cvs_predictions.csv
+[21:50:27] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/cvs_predictions_plot.png
+[21:50:27] DeepAR.Eval: 预测生成完成。摘要统计:
+[21:50:27] DeepAR.Eval: 样本数: 67
+[21:50:27] DeepAR.Eval: 平均绝对误差 (MAE): 0.077698
+[21:50:27] DeepAR.Eval: 均方根误差 (RMSE): 0.082737
+[21:50:27] DeepAR.Eval: 方向准确率: 0.4478
+[21:50:27] DeepAR.Eval: 已将预测数据保存到: experiments/cvs_base_model/predictions_data_best.json
+[21:53:23] DeepAR.Eval: Not using cuda...
+[21:53:23] DeepAR.Eval: Loading the datasets...
+[21:53:23] DeepAR.Data: test_len: 67
+[21:53:23] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[21:53:23] DeepAR.Eval: - done.
+[21:53:23] DeepAR.Eval: Starting evaluation
+[21:53:35] DeepAR.Eval: - Full test metrics: ND: 1.882; RMSE: 2.257; test_loss: 4.657
+[21:53:35] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/cvs_predictions.csv
+[21:53:35] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/cvs_predictions_plot.png
+[21:53:35] DeepAR.Eval: 预测生成完成。摘要统计:
+[21:53:35] DeepAR.Eval: 样本数: 67
+[21:53:35] DeepAR.Eval: 平均绝对误差 (MAE): 0.024869
+[21:53:35] DeepAR.Eval: 均方根误差 (RMSE): 0.029612
+[21:53:35] DeepAR.Eval: 方向准确率: 0.5672
+[21:53:35] DeepAR.Eval: 已将预测数据保存到: experiments/cvs_base_model/predictions_data_epoch_14.json
+[11:42:53] DeepAR.Eval: Not using cuda...
+[11:42:53] DeepAR.Eval: Loading the datasets...
+[11:42:53] DeepAR.Data: test_len: 67
+[11:42:53] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[11:42:53] DeepAR.Eval: - done.
+[11:42:53] DeepAR.Eval: Starting evaluation
+[11:44:00] DeepAR.Eval: - Full test metrics: ND: 1.035; RMSE: 7.811; test_loss: 4.985; rou90: 372330.225; rou50: 221492.663
+[11:44:00] DeepAR.Eval: 预测日期范围: 2024-09-18 至 2025-03-15
+[11:44:00] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/csv_predictions.csv
+[11:44:01] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/csv_predictions_plot.png
+[11:44:01] DeepAR.Eval: 预测生成完成。摘要统计:
+[11:44:01] DeepAR.Eval: 样本数: 67
+[11:44:01] DeepAR.Eval: 平均绝对误差 (MAE): 0.088685
+[11:44:01] DeepAR.Eval: 均方根误差 (RMSE): 0.109395
+[11:44:01] DeepAR.Eval: 方向准确率: 0.4478
+[11:44:01] DeepAR.Eval: 已将预测数据保存到: experiments/cvs_base_model/predictions_data_best.json
+[11:51:19] DeepAR.Eval: Not using cuda...
+[11:51:19] DeepAR.Eval: Loading the datasets...
+[11:51:19] DeepAR.Data: test_len: 67
+[11:51:19] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[11:51:19] DeepAR.Eval: - done.
+[11:51:19] DeepAR.Eval: Starting evaluation
+[11:52:26] DeepAR.Eval: - Full test metrics: ND: 1.157; RMSE: 2.262; test_loss: 4.696; rou90: 30055.774; rou50: 68978.353
+[11:52:26] DeepAR.Eval: 预测日期范围: 2024-09-18 至 2025-03-15
+[11:52:26] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/cvs_predictions.csv
+[11:52:26] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/cvs_predictions_plot.png
+[11:52:26] DeepAR.Eval: 预测生成完成。摘要统计:
+[11:52:26] DeepAR.Eval: 样本数: 67
+[11:52:26] DeepAR.Eval: 平均绝对误差 (MAE): 0.024774
+[11:52:26] DeepAR.Eval: 均方根误差 (RMSE): 0.029742
+[11:52:26] DeepAR.Eval: 方向准确率: 0.5373
+[11:52:26] DeepAR.Eval: 已将预测数据保存到: experiments/cvs_base_model/predictions_data_epoch_14.json
+[12:04:21] DeepAR.Eval: Not using cuda...
+[12:04:21] DeepAR.Eval: Loading the datasets...
+[12:04:21] DeepAR.Data: test_len: 67
+[12:04:21] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[12:04:21] DeepAR.Eval: - done.
+[12:04:21] DeepAR.Eval: Starting evaluation
+[12:08:02] DeepAR.Eval: - Full test metrics: ND: 1.059; RMSE: 2.300; test_loss: 4.554; rou90: 30086.536; rou50: 70422.635
+[12:08:02] DeepAR.Eval: 加载原始股票数据: data/stock/cvs_stock_wsenti.csv
+[12:08:02] DeepAR.Eval: 加载原始数据时出错: [Errno 2] No such file or directory: 'data/stock/cvs_stock_wsenti.csv'
+[12:08:02] DeepAR.Eval: 继续使用模型评估中的目标值
+[12:08:02] DeepAR.Eval: 预测日期范围: 2024-09-18 至 2025-03-15
+[12:08:02] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/cvs_predictions.csv
+[12:08:02] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/cvs_predictions_plot.png
+[12:08:02] DeepAR.Eval: 预测生成完成。摘要统计:
+[12:08:02] DeepAR.Eval: 样本数: 67
+[12:08:02] DeepAR.Eval: 平均绝对误差 (MAE): 0.025358
+[12:08:02] DeepAR.Eval: 均方根误差 (RMSE): 0.030433
+[12:08:02] DeepAR.Eval: 方向准确率: 0.5672
+[12:08:02] DeepAR.Eval: 已将预测数据保存到: experiments/cvs_base_model/predictions_data_epoch_14.json
+[12:10:13] DeepAR.Eval: Not using cuda...
+[12:10:13] DeepAR.Eval: Loading the datasets...
+[12:10:13] DeepAR.Data: test_len: 67
+[12:10:13] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[12:10:13] DeepAR.Eval: - done.
+[12:10:13] DeepAR.Eval: Starting evaluation
+[12:19:27] DeepAR.Eval: - Full test metrics: ND: 1.023; RMSE: 2.248; test_loss: 4.808; rou90: 29745.826; rou50: 69454.314
+[12:19:27] DeepAR.Eval: 加载原始股票数据: ../data/stock/cvs_stock_wsenti.csv
+[12:19:27] DeepAR.Eval: 加载原始数据时出错: You are trying to merge on datetime64[ns] and datetime64[ns, UTC] columns for key 'Date'. If you wish to proceed you should use pd.concat
+[12:19:27] DeepAR.Eval: 继续使用模型评估中的目标值
+[12:19:27] DeepAR.Eval: 预测日期范围: 2024-09-18 至 2025-03-15
+[12:19:27] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/cvs_predictions.csv
+[12:19:28] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/cvs_predictions_plot.png
+[12:19:28] DeepAR.Eval: 预测生成完成。摘要统计:
+[12:19:28] DeepAR.Eval: 样本数: 67
+[12:19:28] DeepAR.Eval: 平均绝对误差 (MAE): 0.024843
+[12:19:28] DeepAR.Eval: 均方根误差 (RMSE): 0.029441
+[12:19:28] DeepAR.Eval: 方向准确率: 0.5522
+[12:19:28] DeepAR.Eval: 已将预测数据保存到: experiments/cvs_base_model/predictions_data_epoch_14.json
+[12:22:36] DeepAR.Eval: Not using cuda...
+[12:22:36] DeepAR.Eval: Loading the datasets...
+[12:22:36] DeepAR.Data: test_len: 67
+[12:22:36] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[12:22:36] DeepAR.Eval: - done.
+[12:22:36] DeepAR.Eval: Starting evaluation
+[12:31:52] DeepAR.Eval: - Full test metrics: ND: 2.260; RMSE: 2.264; test_loss: 4.952; rou90: 30144.374; rou50: 69411.463
+[12:31:52] DeepAR.Eval: 加载原始股票数据: ../data/stock/cvs_stock_wsenti.csv
+[12:31:52] DeepAR.Eval: 使用原始数据评估 - MAE: 0.029205, RMSE: 0.038364, 方向准确率: 0.5000
+[12:31:52] DeepAR.Eval: 预测日期范围: 2024-09-18 至 2025-03-15
+[12:31:52] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/cvs_predictions.csv
+[12:31:52] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/cvs_predictions_plot.png
+[12:31:52] DeepAR.Eval: 预测生成完成。摘要统计:
+[12:31:52] DeepAR.Eval: 样本数: 67
+[12:31:52] DeepAR.Eval: 平均绝对误差 (MAE): 0.024994
+[12:31:52] DeepAR.Eval: 均方根误差 (RMSE): 0.030143
+[12:31:52] DeepAR.Eval: 方向准确率: 0.5373
+[12:31:52] DeepAR.Eval: 已将预测数据保存到: experiments/cvs_base_model/predictions_data_epoch_14.json
+[12:36:47] DeepAR.Eval: Not using cuda...
+[12:36:47] DeepAR.Eval: Loading the datasets...
+[12:36:47] DeepAR.Data: test_len: 67
+[12:36:47] DeepAR.Data: building datasets from data/cvs_stock_processed...
+[12:36:47] DeepAR.Eval: - done.
+[12:36:47] DeepAR.Eval: Starting evaluation
+[12:38:02] DeepAR.Eval: - Full test metrics: ND: 1.041; RMSE: 2.290; test_loss: 4.487; rou90: 29974.175; rou50: 69233.808
+[12:38:02] DeepAR.Eval: 加载原始股票数据: ../data/stock/cvs_stock_wsenti.csv
+[12:38:02] DeepAR.Eval: 使用原始数据评估 - MAE: 0.033332, RMSE: 0.042571, 方向准确率: 0.4352
+[12:38:02] DeepAR.Eval: 预测日期范围: 2024-09-18 至 2025-02-24
+[12:38:02] DeepAR.Eval: 已将预测结果保存到: experiments/cvs_base_model/cvs_predictions.csv
+[12:38:02] DeepAR.Eval: 已保存预测可视化图表到: experiments/cvs_base_model/cvs_predictions_plot.png
+[12:38:02] DeepAR.Eval: 预测生成完成。摘要统计:
+[12:38:02] DeepAR.Eval: 样本数: 67
+[12:38:02] DeepAR.Eval: 平均绝对误差 (MAE): 0.024263
+[12:38:02] DeepAR.Eval: 均方根误差 (RMSE): 0.028606
+[12:38:02] DeepAR.Eval: 方向准确率: 0.5821
+[12:38:02] DeepAR.Eval: 已将预测数据保存到: experiments/cvs_base_model/predictions_data_epoch_14.json

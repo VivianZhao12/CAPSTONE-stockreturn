@@ -1,6 +1,7 @@
 import argparse
 import logging
 import os
+import json
 
 import numpy as np
 import torch
@@ -24,8 +25,15 @@ parser.add_argument('--model-name', default='cvs_base_model', help='Directory co
 parser.add_argument('--relative-metrics', action='store_true', help='Whether to normalize the metrics by label scales')
 parser.add_argument('--sampling', action='store_true', help='Whether to sample during evaluation')
 parser.add_argument('--restore-file', default='best',
-                    help='Optional, name of the file in --model_dir containing weights to reload before \
-                    training')  # 'best' or 'epoch_#'
+                   help='Optional, name of the file in --model_dir containing weights to reload before training')
+# 添加保存预测结果的参数
+parser.add_argument('--save-predictions', action='store_true', help='Whether to save predictions to CSV')
+parser.add_argument('--predictions-file', default='predictions.csv', 
+                   help='Path to save predictions CSV file (relative to model directory)')
+parser.add_argument('--test-start', default='2024-09-18', 
+                   help='Test data start date (YYYY-MM-DD), used when saving predictions')
+parser.add_argument('--test-end', default='2025-03-15', 
+                   help='Test data end date (YYYY-MM-DD), limit predictions up to this date')
 
 
 def evaluate(model, loss_fn, test_loader, params, plot_num, sample=True):
@@ -40,79 +48,101 @@ def evaluate(model, loss_fn, test_loader, params, plot_num, sample=True):
     '''
     model.eval()
     with torch.no_grad():
-      """
-      original content
-      plot_batch = np.random.randint(len(test_loader)-1)
-      """
-      n_batches = len(test_loader)
-      if n_batches <= 1:
-          plot_batch = 0
-      else:
-          plot_batch = np.random.randint(n_batches-1)
+        n_batches = len(test_loader)
+        if n_batches <= 1:
+            plot_batch = 0
+        else:
+            plot_batch = np.random.randint(n_batches-1)
 
-      summary_metric = {}
-      raw_metrics = utils.init_metrics(sample=sample)
-      
-      
-      for i, (test_batch, id_batch, v, labels) in enumerate(tqdm(test_loader)):
-          test_batch = test_batch.permute(1, 0, 2).to(torch.float32).to(params.device)
-          id_batch = id_batch.unsqueeze(0).to(params.device)
-          v_batch = v.to(torch.float32).to(params.device)
-          labels = labels.to(torch.float32).to(params.device)
-          batch_size = test_batch.shape[1]
-          input_mu = torch.zeros(batch_size, params.test_predict_start, device=params.device) # scaled
-          input_sigma = torch.zeros(batch_size, params.test_predict_start, device=params.device) # scaled
-          hidden = model.init_hidden(batch_size)
-          cell = model.init_cell(batch_size)
+        summary_metric = {}
+        raw_metrics = utils.init_metrics(sample=sample)
+        
+        # 收集所有预测和真实值
+        all_samples = []
+        all_sample_mu = []
+        all_labels = []
+        
+        for i, (test_batch, id_batch, v, labels) in enumerate(tqdm(test_loader)):
+            test_batch = test_batch.permute(1, 0, 2).to(torch.float32).to(params.device)
+            id_batch = id_batch.unsqueeze(0).to(params.device)
+            v_batch = v.to(torch.float32).to(params.device)
+            labels = labels.to(torch.float32).to(params.device)
+            batch_size = test_batch.shape[1]
+            input_mu = torch.zeros(batch_size, params.test_predict_start, device=params.device) # scaled
+            input_sigma = torch.zeros(batch_size, params.test_predict_start, device=params.device) # scaled
+            hidden = model.init_hidden(batch_size)
+            cell = model.init_cell(batch_size)
 
-          for t in range(params.test_predict_start):
-              # if z_t is missing, replace it by output mu from the last time step
-              zero_index = (test_batch[t,:,0] == 0)
-              if t > 0 and torch.sum(zero_index) > 0:
-                  test_batch[t,zero_index,0] = mu[zero_index]
+            for t in range(params.test_predict_start):
+                # if z_t is missing, replace it by output mu from the last time step
+                zero_index = (test_batch[t,:,0] == 0)
+                if t > 0 and torch.sum(zero_index) > 0:
+                    test_batch[t,zero_index,0] = mu[zero_index]
 
-              mu, sigma, hidden, cell = model(test_batch[t].unsqueeze(0), id_batch, hidden, cell)
-              input_mu[:,t] = v_batch[:, 0] * mu + v_batch[:, 1]
-              input_sigma[:,t] = v_batch[:, 0] * sigma
+                mu, sigma, hidden, cell = model(test_batch[t].unsqueeze(0), id_batch, hidden, cell)
+                input_mu[:,t] = v_batch[:, 0] * mu + v_batch[:, 1]
+                input_sigma[:,t] = v_batch[:, 0] * sigma
 
-          if sample:
-              samples, sample_mu, sample_sigma = model.test(test_batch, v_batch, id_batch, hidden, cell, sampling=True)
-              raw_metrics = utils.update_metrics(raw_metrics, input_mu, input_sigma, sample_mu, labels, params.test_predict_start, samples, relative = params.relative_metrics)
-          else:
-              sample_mu, sample_sigma = model.test(test_batch, v_batch, id_batch, hidden, cell)
-              raw_metrics = utils.update_metrics(raw_metrics, input_mu, input_sigma, sample_mu, labels, params.test_predict_start, relative = params.relative_metrics)
+            if sample:
+                samples, sample_mu, sample_sigma = model.test(test_batch, v_batch, id_batch, hidden, cell, sampling=True)
+                # 收集预测和真实值
+                all_samples.append(samples.cpu().numpy())
+                all_sample_mu.append(sample_mu.cpu().numpy())
+                all_labels.append(labels[:, params.test_predict_start:].cpu().numpy())
+                
+                raw_metrics = utils.update_metrics(raw_metrics, input_mu, input_sigma, sample_mu, labels, params.test_predict_start, samples, relative = params.relative_metrics)
+            else:
+                sample_mu, sample_sigma = model.test(test_batch, v_batch, id_batch, hidden, cell)
+                # 收集预测和真实值
+                all_sample_mu.append(sample_mu.cpu().numpy())
+                all_labels.append(labels[:, params.test_predict_start:].cpu().numpy())
+                
+                raw_metrics = utils.update_metrics(raw_metrics, input_mu, input_sigma, sample_mu, labels, params.test_predict_start, relative = params.relative_metrics)
 
-          if i == plot_batch:
-              if sample:
-                  sample_metrics = utils.get_metrics(sample_mu, labels, params.test_predict_start, samples, relative = params.relative_metrics)
-              else:
-                  sample_metrics = utils.get_metrics(sample_mu, labels, params.test_predict_start, relative = params.relative_metrics)                
-              # select 10 from samples with highest error and 10 from the rest
-              top_10_nd_sample = (-sample_metrics['ND']).argsort()[:batch_size // 10]  # hard coded to be 10
-              chosen = set(top_10_nd_sample.tolist())
-              all_samples = set(range(batch_size))
-              not_chosen = np.asarray(list(all_samples - chosen))
-              if batch_size < 100: # make sure there are enough unique samples to choose top 10 from
-                  random_sample_10 = np.random.choice(top_10_nd_sample, size=10, replace=True)
-              else:
-                  random_sample_10 = np.random.choice(top_10_nd_sample, size=10, replace=False)
-              if batch_size < 12: # make sure there are enough unique samples to choose bottom 90 from
-                  random_sample_90 = np.random.choice(not_chosen, size=10, replace=True)
-              else:
-                  random_sample_90 = np.random.choice(not_chosen, size=10, replace=False)
-              combined_sample = np.concatenate((random_sample_10, random_sample_90))
+            if i == plot_batch:
+                if sample:
+                    sample_metrics = utils.get_metrics(sample_mu, labels, params.test_predict_start, samples, relative = params.relative_metrics)
+                else:
+                    sample_metrics = utils.get_metrics(sample_mu, labels, params.test_predict_start, relative = params.relative_metrics)                
+                # select 10 from samples with highest error and 10 from the rest
+                top_10_nd_sample = (-sample_metrics['ND']).argsort()[:batch_size // 10]  # hard coded to be 10
+                chosen = set(top_10_nd_sample.tolist())
+                all_samples_set = set(range(batch_size))
+                not_chosen = np.asarray(list(all_samples_set - chosen))
+                if batch_size < 100: # make sure there are enough unique samples to choose top 10 from
+                    random_sample_10 = np.random.choice(top_10_nd_sample, size=10, replace=True)
+                else:
+                    random_sample_10 = np.random.choice(top_10_nd_sample, size=10, replace=False)
+                if batch_size < 12: # make sure there are enough unique samples to choose bottom 90 from
+                    random_sample_90 = np.random.choice(not_chosen, size=10, replace=True)
+                else:
+                    random_sample_90 = np.random.choice(not_chosen, size=10, replace=False)
+                combined_sample = np.concatenate((random_sample_10, random_sample_90))
 
-              label_plot = labels[combined_sample].data.cpu().numpy()
-              predict_mu = sample_mu[combined_sample].data.cpu().numpy()
-              predict_sigma = sample_sigma[combined_sample].data.cpu().numpy()
-              plot_mu = np.concatenate((input_mu[combined_sample].data.cpu().numpy(), predict_mu), axis=1)
-              plot_sigma = np.concatenate((input_sigma[combined_sample].data.cpu().numpy(), predict_sigma), axis=1)
-              plot_metrics = {_k: _v[combined_sample] for _k, _v in sample_metrics.items()}
-              plot_eight_windows(params.plot_dir, plot_mu, plot_sigma, label_plot, params.test_window, params.test_predict_start, plot_num, plot_metrics, sample)
+                label_plot = labels[combined_sample].data.cpu().numpy()
+                predict_mu = sample_mu[combined_sample].data.cpu().numpy()
+                predict_sigma = sample_sigma[combined_sample].data.cpu().numpy()
+                plot_mu = np.concatenate((input_mu[combined_sample].data.cpu().numpy(), predict_mu), axis=1)
+                plot_sigma = np.concatenate((input_sigma[combined_sample].data.cpu().numpy(), predict_sigma), axis=1)
+                plot_metrics = {_k: _v[combined_sample] for _k, _v in sample_metrics.items()}
+                plot_eight_windows(params.plot_dir, plot_mu, plot_sigma, label_plot, params.test_window, params.test_predict_start, plot_num, plot_metrics, sample)
 
-      summary_metric = utils.final_metrics(raw_metrics, sampling=sample)
-      metrics_string = '; '.join('{}: {:05.3f}'.format(k, v) for k, v in summary_metric.items())
-      logger.info('- Full test metrics: ' + metrics_string)
+        # 合并所有批次的预测和真实值
+        if all_sample_mu:
+            predictions = np.concatenate(all_sample_mu, axis=0)
+            targets = np.concatenate(all_labels, axis=0)
+        else:
+            predictions = np.array([])
+            targets = np.array([])
+        
+        summary_metric = utils.final_metrics(raw_metrics, sampling=sample)
+        metrics_string = '; '.join('{}: {:05.3f}'.format(k, v) for k, v in summary_metric.items())
+        logger.info('- Full test metrics: ' + metrics_string)
+        
+        # 将预测和真实值添加到summary_metric
+        summary_metric['predictions'] = predictions.tolist() if predictions.size > 0 else []
+        summary_metric['targets'] = targets.tolist() if targets.size > 0 else []
+    
     return summary_metric
 
 
@@ -146,9 +176,6 @@ def plot_eight_windows(plot_dir,
         ax[k].plot(x, labels[m, :], color='r')
         ax[k].axvline(predict_start, color='g', linestyle='dashed')
 
-        #metrics = utils.final_metrics_({_k: [_i[k] for _i in _v] for _k, _v in plot_metrics.items()})
-
-
         plot_metrics_str = f'ND: {plot_metrics["ND"][m]: .3f} ' \
             f'RMSE: {plot_metrics["RMSE"][m]: .3f}'
         if sampling:
@@ -159,6 +186,149 @@ def plot_eight_windows(plot_dir,
 
     f.savefig(os.path.join(plot_dir, str(plot_num) + '.png'))
     plt.close()
+
+def save_predictions_to_csv(predictions, targets, test_start, test_end, stride_size, output_file):
+    """
+    将预测结果保存到CSV文件，并使用原始股票数据作为actual值
+    """
+    import pandas as pd
+    from datetime import datetime, timedelta
+    
+    # 创建日期序列
+    start_date = datetime.strptime(test_start, '%Y-%m-%d')
+    end_date = datetime.strptime(test_end, '%Y-%m-%d') if test_end else None
+    
+    # 确保预测是二维数组
+    if predictions.ndim == 1:
+        predictions = predictions.reshape(-1, 1)
+    
+    # 将预测重塑为每日格式
+    daily_predictions = []
+    daily_dates = []
+    
+    for i in range(predictions.shape[0]):
+        base_date = start_date + timedelta(days=i*stride_size)
+        
+        # 对每个预测步长
+        for j in range(predictions.shape[1]):
+            # 当前日期 = 基础日期 + j天
+            curr_date = base_date + timedelta(days=j)
+            
+            # 如果设置了结束日期且当前日期超过结束日期，跳过
+            if end_date and curr_date > end_date:
+                continue
+                
+            # 获取预测值
+            pred_value = predictions[i, j]
+            
+            daily_predictions.append(pred_value)
+            daily_dates.append(curr_date)
+    
+    # 创建预测DataFrame
+    df = pd.DataFrame({
+        'Date': daily_dates,
+        'prediction': daily_predictions
+    })
+    
+    # 删除重复日期（保留最后一个预测）
+    df = df.drop_duplicates(subset='Date', keep='last')
+    df = df.sort_values('Date')
+    
+    # 加载原始股票数据
+    original_data_path = '../data/stock/cvs_stock_wsenti.csv'  # 调整为你的文件路径
+    logger.info(f"加载原始股票数据: {original_data_path}")
+    try:
+        original_data = pd.read_csv('../data/stock/cvs_stock_wsenti.csv')
+        original_data['Date'] = pd.to_datetime(original_data['Date']).dt.tz_localize(None)
+        df['Date'] = df['Date'].dt.tz_localize(None)
+        df = pd.merge(df, original_data[['Date', 'Daily Return']], 
+                     on='Date', how='inner')
+        
+        # 重命名列
+        df.rename(columns={'Daily Return': 'actual'}, inplace=True)
+        
+        # 添加预测误差
+        df['error'] = df['prediction'] - df['actual']
+        df['abs_error'] = abs(df['error'])
+        
+        # 添加方向正确性（仅对非NaN值）
+        df['correct_direction'] = np.nan
+        valid_indices = ~df['prediction'].isna() & ~df['actual'].isna()
+        df.loc[valid_indices, 'correct_direction'] = (df.loc[valid_indices, 'prediction'] * df.loc[valid_indices, 'actual']) > 0
+        
+        # 计算评估指标
+        valid_df = df.dropna(subset=['actual'])
+        if len(valid_df) > 0:
+            mae = valid_df['abs_error'].mean()
+            rmse = np.sqrt((valid_df['error'] ** 2).mean())
+            dir_acc = valid_df['correct_direction'].mean()
+            
+            logger.info(f"使用原始数据评估 - MAE: {mae:.6f}, RMSE: {rmse:.6f}, 方向准确率: {dir_acc:.4f}")
+    except Exception as e:
+        logger.error(f"加载原始数据时出错: {e}")
+        logger.info("继续使用模型评估中的目标值")
+        df['actual'] = np.nan
+        
+        # 尝试添加模型评估中的目标值
+        if targets.size > 0:
+            # 创建日期到目标值的映射
+            target_dates = []
+            target_values = []
+            
+            for i in range(targets.shape[0]):
+                base_date = start_date + timedelta(days=i*stride_size)
+                for j in range(targets.shape[1]):
+                    curr_date = base_date + timedelta(days=j)
+                    if end_date and curr_date > end_date:
+                        continue
+                    target_values.append(targets[i, j])
+                    target_dates.append(curr_date)
+            
+            target_df = pd.DataFrame({
+                'Date': target_dates,
+                'actual_model': target_values
+            }).drop_duplicates(subset='Date', keep='last')
+            
+            # 合并到预测DataFrame
+            df = pd.merge(df, target_df, on='Date', how='left')
+            
+            # 如果没有原始actual，使用模型的actual
+            mask = df['actual'].isna()
+            df.loc[mask, 'actual'] = df.loc[mask, 'actual_model']
+            df.drop('actual_model', axis=1, inplace=True)
+    
+    # 日期范围信息
+    min_date = df['Date'].min().strftime('%Y-%m-%d')
+    max_date = df['Date'].max().strftime('%Y-%m-%d')
+    logger.info(f"预测日期范围: {min_date} 至 {max_date}")
+    
+    # 保存到CSV
+    df.to_csv(output_file, index=False)
+    logger.info(f"已将预测结果保存到: {output_file}")
+    
+    # 可视化预测
+    plt.figure(figsize=(12, 6))
+    
+    # 绘制实际值（如果有）
+    if not df['actual'].isna().all():
+        plt.plot(df['Date'], df['actual'], 'o-', label='Actual', color='blue', alpha=0.7, markersize=3)
+    
+    # 绘制预测值
+    plt.plot(df['Date'], df['prediction'], 'x--', label='Prediction', color='red', alpha=0.7, markersize=3)
+    
+    plt.title(f'DeepAR Predictions vs Actual Values ({min_date} to {max_date})')
+    plt.xlabel('Date')
+    plt.ylabel('Daily Return')
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    
+    # 保存图表
+    plot_file = output_file.replace('.csv', '_plot.png')
+    plt.savefig(plot_file)
+    logger.info(f"已保存预测可视化图表到: {plot_file}")
+    
+    return df
 
 if __name__ == '__main__':
     # Load the parameters
@@ -175,6 +345,9 @@ if __name__ == '__main__':
     params.sampling = args.sampling
     params.model_dir = model_dir
     params.plot_dir = os.path.join(model_dir, 'figures')
+    
+    # 确保图表目录存在
+    os.makedirs(params.plot_dir, exist_ok=True)
     
     cuda_exist = torch.cuda.is_available()  # use GPU is available
 
@@ -205,6 +378,51 @@ if __name__ == '__main__':
     # Reload weights from the saved file
     utils.load_checkpoint(os.path.join(model_dir, args.restore_file + '.pth.tar'), model)
 
+    # 运行评估
     test_metrics = evaluate(model, loss_fn, test_loader, params, -1, params.sampling)
+    
+    # 从test_metrics中提取预测和目标数据
+    predictions = np.array(test_metrics.pop('predictions', []))
+    targets = np.array(test_metrics.pop('targets', []))
+    
+    # 保存评估指标（不含预测和目标数据）
     save_path = os.path.join(model_dir, 'metrics_test_{}.json'.format(args.restore_file))
     utils.save_dict_to_json(test_metrics, save_path)
+    
+    # 如果需要保存预测结果
+    if args.save_predictions and predictions.size > 0 and targets.size > 0:
+        # 获取stride_size
+        stride_size = getattr(params, 'stride_size', 5)
+        
+        # 保存预测结果到CSV
+        predictions_file = os.path.join(model_dir, args.predictions_file)
+        save_predictions_to_csv(predictions, targets, args.test_start, args.test_end, stride_size, predictions_file)
+        
+        # 输出统计信息
+        logger.info("预测生成完成。摘要统计:")
+        
+        # 简单统计 - 使用预测和目标的第一列
+        pred_col = predictions[:, 0] if predictions.ndim > 1 else predictions
+        target_col = targets[:, 0] if targets.ndim > 1 else targets
+        
+        # 计算指标
+        mae = np.mean(np.abs(pred_col - target_col))
+        rmse = np.sqrt(np.mean((pred_col - target_col)**2))
+        direction_acc = np.mean((pred_col * target_col) > 0)
+        
+        logger.info(f"样本数: {len(pred_col)}")
+        logger.info(f"平均绝对误差 (MAE): {mae:.6f}")
+        logger.info(f"均方根误差 (RMSE): {rmse:.6f}")
+        logger.info(f"方向准确率: {direction_acc:.4f}")
+        
+        # 单独保存预测和目标数据（如果需要）
+        predictions_data = {
+            'predictions': predictions.tolist(),
+            'targets': targets.tolist()
+        }
+        
+        predictions_json_path = os.path.join(model_dir, 'predictions_data_{}.json'.format(args.restore_file))
+        with open(predictions_json_path, 'w') as f:
+            json.dump(predictions_data, f)
+        
+        logger.info(f"已将预测数据保存到: {predictions_json_path}")
