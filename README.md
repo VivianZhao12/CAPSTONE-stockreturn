@@ -43,12 +43,18 @@ pip install -r requirements.txt
 
 ## Data Preparation and Model Training
 1. DeepAR Model:
+cd CAPSTONE-stockreturn/DeepAR/
 ```bash
 # Prepare the data
-python DeepAR/preprocess.py
+## if ran with sentiment data
+python preprocess.py token_lowercase --with_sentiment
+## if ran without sentiment data
+python preprocess.py token_lowercase
+
+* note: replace token_lowercase with company ticker name in lower case
 
 # Train the model
-python DeepAR/train.py --config config.yml
+python train.py
 ```
 
 2. Sentiment Analysis
