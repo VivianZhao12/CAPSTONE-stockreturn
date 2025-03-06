@@ -10,6 +10,8 @@ import numpy as np
 import random
 from tqdm import trange
 from scipy import stats
+import argparse
+
 
 import matplotlib
 matplotlib.use('Agg')
@@ -85,7 +87,7 @@ def prep_data(data, covariates, data_start, train=True):
     np.save(prefix+'v_'+save_name, v_input)
     np.save(prefix+'label_'+save_name, label)
     
-def gen_covariates(times, price_data, num_covariates):
+def gen_covariates(times, price_data, num_covariates, with_sentiment=False):
     """
     Creates additional features including technical indicators
     Args:
@@ -126,8 +128,8 @@ def gen_covariates(times, price_data, num_covariates):
     volatility = (price_data['High'] - price_data['Low']) / price_data['Close']
     covariates[:, 7] = stats.zscore(volatility.values)
 
-    # Sentiment Impact
-    covariates[:, 8] = stats.zscore(price_data['Sentiment_Score'].shift(5).values)
+    if with_sentiment:
+        covariates[:, 8] = stats.zscore(price_data['Sentiment_Score'].shift(5).values)
     
     # Fill NaN values with 0
     covariates = np.nan_to_num(covariates)
@@ -142,13 +144,21 @@ def visualize(data, week_start):
     plt.close()
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description="Stock Data Preprocessing Script")
+    parser.add_argument('--with_sentiment', action='store_true', help="Include sentiment analysis in feature set")
+    parser.add_argument('ticker', type=str, help="Stock ticker symbol (e.g., AAPL, MSFT, ABT)")
+
+    args = parser.parse_args()
+    ticker = args.ticker 
+    
     # Configuration
     save_path = ''
-    name = 'amzn_stock_wsenti.csv'
-    save_name = 'amzn_stock_processed'
+    name = f'{ticker}_stock_data.csv'
+    save_name = f'{ticker}_stock_processed'
     window_size = 30    # Size of each data window
     stride_size = 5    # How far to move the window each time
-    num_covariates = 9  # Number of features (2 time + 2 OHLCV + 4 technical)
+    
+    num_covariates = 8 if not args.with_sentiment else 9  # Number of features (2 time + 2 OHLCV + 4 technical)
     train_start = '2020-06-02'
     train_end = '2023-09-25'
     test_start = '2023-09-18'
@@ -162,7 +172,10 @@ if __name__ == '__main__':
         os.makedirs(save_path)
 
     # Load and prepare data
-    csv_path = '../data/stock/amzn_stock_wsenti.csv'
+    if args.with_sentiment:
+        csv_path = f'../data/stock/{ticker}_stock_wsenti.csv'
+    else:
+        csv_path = f'../data/stock/{ticker}_stock_data.csv'
     data_frame = pd.read_csv(csv_path, parse_dates=True)
     
     # Process date column
@@ -179,9 +192,11 @@ if __name__ == '__main__':
     
     # Generate features
     # pre-select features using PCMCI
-    price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume', 'Sentiment_Score']]
-    # price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume']]
-    covariates = gen_covariates(data_frame[train_start:test_end].index, price_data, num_covariates)
+    if args.with_sentiment:
+        price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume', 'Sentiment_Score']]
+    else:
+        price_data = data_frame[['High', 'Low', 'Open', 'Close', 'Volume']]
+    covariates = gen_covariates(data_frame[train_start:test_end].index, price_data, num_covariates, with_sentiment=args.with_sentiment)
 
     # Split data
     train_data = data_frame[train_start:train_end]['Daily Return'].values.reshape(-1, 1)
