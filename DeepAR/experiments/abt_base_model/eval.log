@@ -1,2 +1,20 @@
 [00:40:31] DeepAR.Eval: Not using cuda...
 [00:40:31] DeepAR.Eval: Loading the datasets...
+[02:45:04] DeepAR.Eval: Not using cuda...
+[02:45:04] DeepAR.Eval: Loading the datasets...
+[02:45:04] DeepAR.Data: test_len: 67
+[02:45:04] DeepAR.Data: building datasets from data/abt_stock_processed...
+[02:45:04] DeepAR.Eval: - done.
+[02:45:04] DeepAR.Eval: Starting evaluation
+[02:48:23] DeepAR.Eval: - Full test metrics: ND: 1.025; RMSE: 4.016; test_loss: 6.118; rou90: 10.931; rou50: 28.475
+[02:48:23] DeepAR.Eval: Loading original stock data: ../data/stock/cvs_stock_wsenti.csv
+[02:48:23] DeepAR.Eval: Evaluation with original data - MAE: 0.036753, RMSE: 0.046804, Direction Accuracy: 0.5278
+[02:48:23] DeepAR.Eval: Prediction date range: 2024-09-18 to 2025-02-24
+[02:48:23] DeepAR.Eval: Prediction results saved to: experiments/abt_base_model/deepar_predictions.csv
+[02:48:23] DeepAR.Eval: Prediction visualization chart saved to: experiments/abt_base_model/deepar_predictions_plot.png
+[02:48:23] DeepAR.Eval: Prediction generation complete. Summary statistics:
+[02:48:23] DeepAR.Eval: Number of samples: 67
+[02:48:23] DeepAR.Eval: Mean Absolute Error (MAE): 0.028580
+[02:48:23] DeepAR.Eval: Root Mean Square Error (RMSE): 0.032662
+[02:48:23] DeepAR.Eval: Direction Accuracy: 0.5672
+[02:48:23] DeepAR.Eval: Prediction data saved to: experiments/abt_base_model/predictions_data_epoch_14.json

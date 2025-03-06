@@ -1,0 +1,18 @@
+[02:39:04] DeepAR.Eval: Not using cuda...
+[02:39:04] DeepAR.Eval: Loading the datasets...
+[02:39:04] DeepAR.Data: test_len: 67
+[02:39:04] DeepAR.Data: building datasets from data/amgn_stock_processed...
+[02:39:04] DeepAR.Eval: - done.
+[02:39:04] DeepAR.Eval: Starting evaluation
+[02:42:51] DeepAR.Eval: - Full test metrics: ND: 3.212; RMSE: 4.897; test_loss: 6.805; rou90: 223.475; rou50: 107.745
+[02:42:51] DeepAR.Eval: Loading original stock data: ../data/stock/cvs_stock_wsenti.csv
+[02:42:51] DeepAR.Eval: Evaluation with original data - MAE: 0.044974, RMSE: 0.059560, Direction Accuracy: 0.4907
+[02:42:51] DeepAR.Eval: Prediction date range: 2024-09-18 to 2025-02-24
+[02:42:51] DeepAR.Eval: Prediction results saved to: experiments/amgn_base_model/deepar_predictions.csv
+[02:42:52] DeepAR.Eval: Prediction visualization chart saved to: experiments/amgn_base_model/deepar_predictions_plot.png
+[02:42:52] DeepAR.Eval: Prediction generation complete. Summary statistics:
+[02:42:52] DeepAR.Eval: Number of samples: 67
+[02:42:52] DeepAR.Eval: Mean Absolute Error (MAE): 0.040244
+[02:42:52] DeepAR.Eval: Root Mean Square Error (RMSE): 0.052332
+[02:42:52] DeepAR.Eval: Direction Accuracy: 0.5970
+[02:42:52] DeepAR.Eval: Prediction data saved to: experiments/amgn_base_model/predictions_data_epoch_0.json
