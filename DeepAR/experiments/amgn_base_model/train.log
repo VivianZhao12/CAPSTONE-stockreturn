@@ -1,0 +1,146 @@
+[23:18:03] DeepAR.Train: Loading the datasets...
+[23:18:03] DeepAR.Data: train_len: 162
+[23:18:03] DeepAR.Data: building datasets from data/amgn_stock_processed...
+[23:18:03] DeepAR.Data: test_len: 67
+[23:18:03] DeepAR.Data: building datasets from data/amgn_stock_processed...
+[23:18:03] DeepAR.Data: weights: tensor([0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0061, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0061,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0061, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0061, 0.0061, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0061, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0061,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0061, 0.0061, 0.0061, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0061, 0.0061, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062,
+        0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062, 0.0062],
+       dtype=torch.float64)
+[23:18:03] DeepAR.Data: num samples: 162
+[23:18:03] DeepAR.Train: Loading complete.
+[23:18:03] DeepAR.Train: Model: 
+Net(
+  (embedding): Embedding(1284, 24)
+  (lstm): LSTM(33, 96, num_layers=2, dropout=0.15)
+  (skip_connection): Linear(in_features=33, out_features=96, bias=True)
+  (distribution_mu): Linear(in_features=192, out_features=1, bias=True)
+  (distribution_presigma): Linear(in_features=192, out_features=1, bias=True)
+  (distribution_sigma): Softplus(beta=1.0, threshold=20.0)
+)
+[23:18:04] DeepAR.Train: Starting training for 15 epoch(s)
+[23:18:04] DeepAR.Train: begin training and evaluation
+[23:18:04] DeepAR.Train: Epoch 1/15
+[23:18:24] DeepAR.Eval: - Full test metrics: ND: 0.999; RMSE: 24.854; test_loss: 7.352
+[23:18:24] DeepAR.Train: train_loss: 1804.6124267578125
+[23:18:24] DeepAR.Train: train_loss: 1804.6124267578125
+[23:19:09] DeepAR.Eval: - Full test metrics: ND: 1.071; RMSE: 3.261; test_loss: 7.087
+[23:19:09] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_0.pth.tar
+[23:19:09] DeepAR.Utils: Best checkpoint copied to best.pth.tar
+[23:19:09] DeepAR.Train: - Found new best ND
+[23:19:09] DeepAR.Train: Current Best ND is: 1.07060
+[23:19:09] DeepAR.Train: Epoch 2/15
+[23:19:35] DeepAR.Eval: - Full test metrics: ND: 1.446; RMSE: 1.701; test_loss: 7.286
+[23:19:35] DeepAR.Train: train_loss: 8502.619140625
+[23:19:35] DeepAR.Train: train_loss: 8502.619140625
+[23:20:18] DeepAR.Eval: - Full test metrics: ND: 1.004; RMSE: 3.880; test_loss: 5.126
+[23:20:18] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_1.pth.tar
+[23:20:18] DeepAR.Utils: Best checkpoint copied to best.pth.tar
+[23:20:18] DeepAR.Train: - Found new best ND
+[23:20:18] DeepAR.Train: Current Best ND is: 1.00449
+[23:20:18] DeepAR.Train: Epoch 3/15
+[23:20:43] DeepAR.Eval: - Full test metrics: ND: 1.019; RMSE: 3.305; test_loss: 4.872
+[23:20:43] DeepAR.Train: train_loss: 171.9352264404297
+[23:20:43] DeepAR.Train: train_loss: 171.9352264404297
+[23:21:21] DeepAR.Eval: - Full test metrics: ND: 1.011; RMSE: 3.007; test_loss: 4.629
+[23:21:21] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_2.pth.tar
+[23:21:21] DeepAR.Train: Current Best ND is: 1.00449
+[23:21:21] DeepAR.Train: Epoch 4/15
+[23:21:48] DeepAR.Eval: - Full test metrics: ND: 1.009; RMSE: 2.618; test_loss: 4.525
+[23:21:48] DeepAR.Train: train_loss: 177.55062866210938
+[23:21:48] DeepAR.Train: train_loss: 177.55062866210938
+[23:22:30] DeepAR.Eval: - Full test metrics: ND: 2.809; RMSE: 1.547; test_loss: 4.418
+[23:22:30] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_3.pth.tar
+[23:22:30] DeepAR.Train: Current Best ND is: 1.00449
+[23:22:31] DeepAR.Train: Epoch 5/15
+[23:22:54] DeepAR.Eval: - Full test metrics: ND: 1.071; RMSE: 2.677; test_loss: 4.897
+[23:22:54] DeepAR.Train: train_loss: 5643.41796875
+[23:22:54] DeepAR.Train: train_loss: 5643.41796875
+[23:23:36] DeepAR.Eval: - Full test metrics: ND: 1.020; RMSE: 2.775; test_loss: 5.051
+[23:23:37] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_4.pth.tar
+[23:23:37] DeepAR.Train: Current Best ND is: 1.00449
+[23:23:37] DeepAR.Train: Epoch 6/15
+[23:24:02] DeepAR.Eval: - Full test metrics: ND: 1.017; RMSE: 2.997; test_loss: 4.052
+[23:24:02] DeepAR.Train: train_loss: 8498.7412109375
+[23:24:02] DeepAR.Train: train_loss: 8498.7412109375
+[23:24:47] DeepAR.Eval: - Full test metrics: ND: 1.024; RMSE: 3.787; test_loss: 5.032
+[23:24:47] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_5.pth.tar
+[23:24:47] DeepAR.Train: Current Best ND is: 1.00449
+[23:24:47] DeepAR.Train: Epoch 7/15
+[23:25:11] DeepAR.Eval: - Full test metrics: ND: 1.022; RMSE: 3.417; test_loss: 3.909
+[23:25:11] DeepAR.Train: train_loss: 258.4940490722656
+[23:25:11] DeepAR.Train: train_loss: 258.4940490722656
+[23:25:57] DeepAR.Eval: - Full test metrics: ND: 1.169; RMSE: 1.829; test_loss: 3.457
+[23:25:57] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_6.pth.tar
+[23:25:57] DeepAR.Train: Current Best ND is: 1.00449
+[23:25:57] DeepAR.Train: Epoch 8/15
+[23:26:22] DeepAR.Eval: - Full test metrics: ND: 3.310; RMSE: 1.686; test_loss: 3.701
+[23:26:22] DeepAR.Train: train_loss: 461.6524963378906
+[23:26:22] DeepAR.Train: train_loss: 461.6524963378906
+[23:27:01] DeepAR.Eval: - Full test metrics: ND: 1.068; RMSE: 2.452; test_loss: 5.005
+[23:27:01] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_7.pth.tar
+[23:27:01] DeepAR.Train: Current Best ND is: 1.00449
+[23:27:01] DeepAR.Train: Epoch 9/15
+[23:27:23] DeepAR.Eval: - Full test metrics: ND: 1.052; RMSE: 3.428; test_loss: 5.017
+[23:27:23] DeepAR.Train: train_loss: 257.4647521972656
+[23:27:23] DeepAR.Train: train_loss: 257.4647521972656
+[23:28:00] DeepAR.Eval: - Full test metrics: ND: 1.113; RMSE: 1.814; test_loss: 3.274
+[23:28:00] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_8.pth.tar
+[23:28:00] DeepAR.Train: Current Best ND is: 1.00449
+[23:28:00] DeepAR.Train: Epoch 10/15
+[23:28:21] DeepAR.Eval: - Full test metrics: ND: 1.169; RMSE: 1.930; test_loss: 3.628
+[23:28:21] DeepAR.Train: train_loss: 839.8617553710938
+[23:28:21] DeepAR.Train: train_loss: 839.8617553710938
+[23:29:03] DeepAR.Eval: - Full test metrics: ND: 2.851; RMSE: 2.604; test_loss: 5.638
+[23:29:03] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_9.pth.tar
+[23:29:03] DeepAR.Train: Current Best ND is: 1.00449
+[23:29:03] DeepAR.Train: Epoch 11/15
+[23:29:26] DeepAR.Eval: - Full test metrics: ND: 1.257; RMSE: 2.837; test_loss: 5.225
+[23:29:26] DeepAR.Train: train_loss: 291.4457702636719
+[23:29:26] DeepAR.Train: train_loss: 291.4457702636719
+[23:30:04] DeepAR.Eval: - Full test metrics: ND: 1.746; RMSE: 1.537; test_loss: 2.965
+[23:30:04] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_10.pth.tar
+[23:30:04] DeepAR.Train: Current Best ND is: 1.00449
+[23:30:04] DeepAR.Train: Epoch 12/15
+[23:30:29] DeepAR.Eval: - Full test metrics: ND: 1.004; RMSE: 2.123; test_loss: 3.339
+[23:30:29] DeepAR.Train: train_loss: 269.5094909667969
+[23:30:29] DeepAR.Train: train_loss: 269.5094909667969
+[23:31:12] DeepAR.Eval: - Full test metrics: ND: 1.127; RMSE: 3.334; test_loss: 5.217
+[23:31:12] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_11.pth.tar
+[23:31:12] DeepAR.Train: Current Best ND is: 1.00449
+[23:31:12] DeepAR.Train: Epoch 13/15
+[23:31:42] DeepAR.Eval: - Full test metrics: ND: 1.145; RMSE: 3.491; test_loss: 5.840
+[23:31:42] DeepAR.Train: train_loss: 254.9287567138672
+[23:31:42] DeepAR.Train: train_loss: 254.9287567138672
+[23:32:20] DeepAR.Eval: - Full test metrics: ND: 1.574; RMSE: 2.588; test_loss: 5.767
+[23:32:20] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_12.pth.tar
+[23:32:20] DeepAR.Train: Current Best ND is: 1.00449
+[23:32:20] DeepAR.Train: Epoch 14/15
+[23:32:46] DeepAR.Eval: - Full test metrics: ND: 1.757; RMSE: 3.339; test_loss: 5.563
+[23:32:46] DeepAR.Train: train_loss: 504.5714416503906
+[23:32:46] DeepAR.Train: train_loss: 504.5714416503906
+[23:33:30] DeepAR.Eval: - Full test metrics: ND: 1.895; RMSE: 6.445; test_loss: 7.299
+[23:33:30] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_13.pth.tar
+[23:33:30] DeepAR.Train: Current Best ND is: 1.00449
+[23:33:31] DeepAR.Train: Epoch 15/15
+[23:33:54] DeepAR.Eval: - Full test metrics: ND: 1.973; RMSE: 6.478; test_loss: 6.140
+[23:33:54] DeepAR.Train: train_loss: 2783.93505859375
+[23:33:54] DeepAR.Train: train_loss: 2783.93505859375
+[23:36:16] DeepAR.Eval: - Full test metrics: ND: 2.307; RMSE: 7.230; test_loss: 6.353
+[23:36:16] DeepAR.Utils: Checkpoint saved to experiments/base_model/epoch_14.pth.tar
+[23:36:16] DeepAR.Train: Current Best ND is: 1.00449
