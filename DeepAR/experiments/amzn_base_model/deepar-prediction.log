@@ -1,0 +1,18 @@
+[04:35:00] DeepAR.Eval: Not using cuda...
+[04:35:00] DeepAR.Eval: Loading the datasets...
+[04:35:00] DeepAR.Data: test_len: 67
+[04:35:00] DeepAR.Data: building datasets from data/amzn_stock_processed...
+[04:35:00] DeepAR.Eval: - done.
+[04:35:00] DeepAR.Eval: Starting evaluation
+[04:36:02] DeepAR.Eval: - Full test metrics: ND: 1.036; RMSE: 2.734; test_loss: 8.808; rou90: 8.946; rou50: 16.310
+[04:36:02] DeepAR.Eval: Loading original stock data: ../data/stock/amzn_stock_wsenti.csv
+[04:36:02] DeepAR.Eval: Evaluation with original data - MAE: 0.031250, RMSE: 0.036547, Direction Accuracy: 0.4907
+[04:36:02] DeepAR.Eval: Prediction date range: 2024-09-18 to 2025-02-24
+[04:36:02] DeepAR.Eval: Prediction results saved to: experiments/amzn_base_model/deepar_predictions.csv
+[04:36:02] DeepAR.Eval: Prediction visualization chart saved to: experiments/amzn_base_model/deepar_predictions_plot.png
+[04:36:02] DeepAR.Eval: Prediction generation complete. Summary statistics:
+[04:36:02] DeepAR.Eval: Number of samples: 67
+[04:36:02] DeepAR.Eval: Mean Absolute Error (MAE): 0.031360
+[04:36:02] DeepAR.Eval: Root Mean Square Error (RMSE): 0.038851
+[04:36:02] DeepAR.Eval: Direction Accuracy: 0.4478
+[04:36:02] DeepAR.Eval: Prediction data saved to: experiments/amzn_base_model/predictions_data_epoch_12.json
