@@ -235,10 +235,10 @@ def save_predictions_to_csv(predictions, targets, test_start, test_end, stride_s
     df = df.sort_values('Date')
     
     # Load original stock data
-    original_data_path = '../data/stock/abt_stock_data.csv'  # Adjust to your file path
+    original_data_path = '../data/stock/goog_stock_data.csv'  # Adjust to your file path
     logger.info(f"Loading original stock data: {original_data_path}")
     try:
-        original_data = pd.read_csv('../data/stock/abt_stock_data.csv')
+        original_data = pd.read_csv('../data/stock/goog_stock_data.csv')
         original_data['Date'] = pd.to_datetime(original_data['Date']).dt.tz_localize(None)
         df['Date'] = df['Date'].dt.tz_localize(None)
         df = pd.merge(df, original_data[['Date', 'Daily Return']], 
