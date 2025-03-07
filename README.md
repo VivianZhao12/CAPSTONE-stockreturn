@@ -36,34 +36,60 @@ python -m venv venv
 source venv/bin/activate  # On Windows, use: venv\Scripts\activate
 ```
 
-3. Install the required packages:
+3. Install the required packages and casaul-learn package:
 ```bash
 pip install -r requirements.txt
+pip install git+https://github.com/py-why/causal-learn.git
+# Install Graphviz system package for causal graph visulization
+For Mac
+brew install graphviz
+
+For Ubuntu/Debian
+sudo apt-get install graphviz
+
+For Windows
+choco install graphviz
+
+Verify with
+dot -V
 ```
 
+
 ## Data Preparation and Model Training
-1. DeepAR Model:
-cd CAPSTONE-stockreturn/DeepAR/
+1. Economic Impact Analysis
+cd macro+micro_regression/cdnod
+```bash
+# Fetch all data from api and run cdnod
+visit "https://www.alphavantage.co/support/#api-key" and generate your own token, replace api_key = "" with your token in cdnod.py
+python cdnod.py
+
+# Align frequency for macro and micro data
+cd macro+micro_regression/
+python align_frequency_test.py
+
+# Predict quarterly impact with selected features for each company
+python cdnod/create_df_cdnod.py
+```
+
+2. DeepAR Model:
+cd DeepAR
 ```bash
 # Prepare the data
-## if ran with sentiment data
+## to run with sentiment data
 python preprocess.py token_lowercase --with_sentiment
-## if ran without sentiment data
+## to run without sentiment data
 python preprocess.py token_lowercase
 
-* note: replace token_lowercase with company ticker name in lower case
+* note: replace token_lowercase with company ticker in lowercase
 
 # Train the model
 python train.py
 ```
 
-2. Sentiment Analysis
+3. Sentiment Analysis
   ```bash
 # Scraping and interpolating data from Google and CSV
 python data/sentiment/Google_and_CSV_data_sraping.ipynb
 
 python data/sentiment/Sentiment_score_with_interpolation.ipynb
 ```
-
-4. Economic Impact Analysis (In Development)
-
