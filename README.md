@@ -1,13 +1,13 @@
 # Causal Discovery in Stock Return
 
-This repository contains the implementation of a multi-model framework for stock return prediction that integrates sentiment analysis, historical stock data, and macroeconomic indicators. The project uses DeepAR for time series prediction, FinBERT for sentiment analysis, and a nowcasting model for economic indicators.
+This repository contains the implementation of a multi-model framework for stock return prediction that integrates sentiment analysis, historical stock data, and macroeconomic indicators. The project uses DeepAR for time series prediction, FinBERT for sentiment analysis, and Random Forest Regressor for economic indicators.
 
 
 ## Project Overview
 Our framework combines three main components:
-- Time series prediction using DeepAR
+- Time series prediction using DeepAR and PCMCI
 - Sentiment analysis using FinBERT
-- Economic impact analysis using nowcasting
+- Economic impact analysis using CDNOD and Random Forest Regressor
 
 ## Project Structure
 ```bash
@@ -45,17 +45,18 @@ source venv/bin/activate  # On Windows, use: venv\Scripts\activate
 ```bash
 pip install -r requirements.txt
 pip install git+https://github.com/py-why/causal-learn.git
+
 # Install Graphviz system package for causal graph visulization
-For Mac
+**For macOS:**
 brew install graphviz
 
-For Ubuntu/Debian
+**For Ubuntu/Debian:**
 sudo apt-get install graphviz
 
-For Windows
+**For Windows:**
 choco install graphviz
 
-Verify with
+**Verify with:**
 dot -V
 ```
 
@@ -64,6 +65,7 @@ dot -V
 1. Economic Impact Analysis
 ```bash
 cd macro+micro_regression/cdnod
+
 # Fetch all data from api and run cdnod
 visit "https://www.alphavantage.co/support/#api-key" and generate your own token, replace api_key = "" with your token in cdnod.py
 python cdnod.py
@@ -75,26 +77,26 @@ python align_frequency_test.py
 # Predict quarterly impact with selected features for each company
 python cdnod/create_df_cdnod.py
 
-* Note we have already pre-selected the fearures based on our resulting graph, for future iterations:
-To select the new feature based on the new graphs:
-1. python cdnod/cdnod_feature_selection.py to automatically select the feature, result would be stored in causal_feature.json under cdnod_graph
+*Note: We have already pre-selected features based on our resulting causal graph.*
+*For future iterations, follow these steps to select new features:*  
+1. run "python cdnod/cdnod_feature_selection.py" to automatically select the feature, results are in causal_feature.json under /cdnod_graph
 2. Read the resulting casual graph and add more features if not captured
-3. Replace "features" varaibles in "create_df_cdnod.py" with your new features!
+3. Modify the "features" variable in create_df_cdnod.py to include your updated feature lists!
 ```
 
 2. DeepAR Model:
 ```bash
 cd ../DeepAR
+
 # Prepare the data
 ## to run with sentiment data
-python preprocess.py token_lowercase --with_sentiment
-## to run without sentiment data
-python preprocess.py token_lowercase
+python preprocess.py <ticker_in_lowercase> --with_sentiment
 
-* note: replace token_lowercase with company ticker in lowercase
+## to run without sentiment data
+python preprocess.py <ticker_in_lowercase>
 
 # Train the model
-python train.py
+python train.py --ticker <ticker_in_lowercase>
 ```
 
 3. Sentiment Analysis
