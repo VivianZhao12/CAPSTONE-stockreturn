@@ -74,7 +74,7 @@ python cdnod.py
 cd ../
 python align_frequency_test.py
 
-# Predict quarterly impact with selected features for each company
+# Create data with cdnod selected features
 python cdnod/create_df_cdnod.py
 
 Note: We have already pre-selected features based on our resulting causal graph.
