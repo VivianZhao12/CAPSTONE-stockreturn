@@ -47,16 +47,16 @@ pip install -r requirements.txt
 pip install git+https://github.com/py-why/causal-learn.git
 
 # Install Graphviz system package for causal graph visulization
-**For macOS:**
+** For macOS: **
 brew install graphviz
 
-**For Ubuntu/Debian:**
+** For Ubuntu/Debian: **
 sudo apt-get install graphviz
 
-**For Windows:**
+** For Windows: **
 choco install graphviz
 
-**Verify with:**
+** Verify with: **
 dot -V
 ```
 
@@ -77,8 +77,8 @@ python align_frequency_test.py
 # Predict quarterly impact with selected features for each company
 python cdnod/create_df_cdnod.py
 
-*Note: We have already pre-selected features based on our resulting causal graph.*
-*For future iterations, follow these steps to select new features:*  
+Note: We have already pre-selected features based on our resulting causal graph.
+For future iterations, follow these steps to select new features:
 1. run "python cdnod/cdnod_feature_selection.py" to automatically select the feature, results are in causal_feature.json under /cdnod_graph
 2. Read the resulting casual graph and add more features if not captured
 3. Modify the "features" variable in create_df_cdnod.py to include your updated feature lists!
