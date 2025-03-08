@@ -97,6 +97,15 @@ python preprocess.py <ticker_in_lowercase>
 
 # Train the model
 python train.py --ticker <ticker_in_lowercase>
+
+# Evaluate the model
+python evaluate.py --ticker <ticker_in_lowercase>
+
+## to run with sentiment data
+python load_model_results.py <ticker_in_lowercase> --with_sentiment
+
+## to run without sentiment data
+python load_model_results.py <ticker_in_lowercase>
 ```
 
 3. Sentiment Analysis
