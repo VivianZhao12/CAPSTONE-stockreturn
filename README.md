@@ -13,13 +13,18 @@ Our framework combines three main components:
 ```bash
 CAPSTONE-stockreturn/
 ├── DeepAR/                    # DeepAR model implementation
-│   ├── experiments/           # Experiment results
-│   └── README.md             # DeepAR specific documentation
-├── FinBERT/                  # FinBERT implementation
-├── data/                     # Main data directory
-│   ├── macro_micro/         # Economic indicators
-│   ├── sentiment/           # Processed sentiment data
-│   └── stock/              # Historical stock data
+│   ├── experiments/           # Experiment results for each company
+│   └── README.md              # DeepAR specific documentation
+├── FinBERT/                   # FinBERT implementation
+├── data/                      # Main data directory
+│   ├── economic/              # Macroecomic indicators
+│   ├── financial/             # Microecomic indicators
+│   ├── macro_micro/           # Processed Macro+Micro data
+│   ├── sentiment/             # Processed sentiment data
+│   └── stock/                 # Historical stock data
+├── macro+micro_regression/    # Macroeconomic and microeconomic regression analysis
+│   ├── cdnod/                 # CDNOD implementation
+|      ├── cdnod_graph/        # CDNOD graphs and selected features
 └── requirements.txt         # Project dependencies
 ```
 
