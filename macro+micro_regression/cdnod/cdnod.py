@@ -219,7 +219,7 @@ if __name__ == "__main__":
 
 
         except Exception as e:
-            print(f"CD-NOD failed: {e}")
+            print(f"Check Graphviz system package: {e}")
     
     with open(os.path.join(CDNOD_DIR, "cdnod_label.jsonl"), "w") as f:
         json.dump(dict, f, indent=4)
