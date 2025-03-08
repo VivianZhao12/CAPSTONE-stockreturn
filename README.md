@@ -57,14 +57,14 @@ dot -V
 
 ## Data Preparation and Model Training
 1. Economic Impact Analysis
-cd macro+micro_regression/cdnod
 ```bash
+cd macro+micro_regression/cdnod
 # Fetch all data from api and run cdnod
 visit "https://www.alphavantage.co/support/#api-key" and generate your own token, replace api_key = "" with your token in cdnod.py
 python cdnod.py
 
 # Align frequency for macro and micro data
-cd macro+micro_regression/
+cd ../
 python align_frequency_test.py
 
 # Predict quarterly impact with selected features for each company
@@ -72,8 +72,8 @@ python cdnod/create_df_cdnod.py
 ```
 
 2. DeepAR Model:
-cd DeepAR
 ```bash
+cd ../DeepAR
 # Prepare the data
 ## to run with sentiment data
 python preprocess.py token_lowercase --with_sentiment
