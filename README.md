@@ -101,11 +101,19 @@ python train.py --ticker <ticker_in_lowercase>
 # Evaluate the model
 python evaluate.py --ticker <ticker_in_lowercase>
 
+# load all epochs' prediction results
 ## to run with sentiment data
 python load_model_results.py <ticker_in_lowercase> --with_sentiment
 
 ## to run without sentiment data
 python load_model_results.py <ticker_in_lowercase>
+
+# Load and save the long term prediction result from human-identified best epoch
+## to run with sentiment data
+python deepar_prediction.py <ticker_in_lowercase> --with-sentiment --epoch <epoch_number>
+
+## to run without sentiment data
+python deepar_prediction.py <ticker_in_lowercase> --epoch <epoch_number>
 ```
 
 3. Sentiment Analysis

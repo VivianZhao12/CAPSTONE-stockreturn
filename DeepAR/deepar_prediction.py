@@ -19,20 +19,15 @@ import matplotlib.pyplot as plt
 logger = logging.getLogger('DeepAR.Eval')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default='goog_stock_processed', help='Name of the dataset')
+parser.add_argument('ticker', type=str, help='Stock ticker symbol (e.g., AAPL, MSFT, GOOG)')
 parser.add_argument('--data-folder', default='data', help='Parent dir of the dataset')
-parser.add_argument('--model-name', default='goog_base_model', help='Directory containing params.json')
 parser.add_argument('--relative-metrics', action='store_true', help='Whether to normalize the metrics by label scales')
 parser.add_argument('--sampling', action='store_true', help='Whether to sample during evaluation')
-parser.add_argument('--restore-file', default='best',
-                   help='Optional, name of the file in --model_dir containing weights to reload before training')
-# Add parameters for saving prediction results
-parser.add_argument('--save-predictions', action='store_true', help='Whether to save predictions to CSV')
-parser.add_argument('--predictions-file', default='predictions.csv', 
-                   help='Path to save predictions CSV file (relative to model directory)')
+parser.add_argument('--epoch', type=int, default=6, help='Epoch number to restore (use -1 for best)')
+parser.add_argument('--with-sentiment', action='store_true', help='Whether to use data with sentiment analysis')
 parser.add_argument('--test-start', default='2024-09-18', 
                    help='Test data start date (YYYY-MM-DD), used when saving predictions')
-parser.add_argument('--test-end', default='2025-03-15', 
+parser.add_argument('--test-end', default='2025-02-24', 
                    help='Test data end date (YYYY-MM-DD), limit predictions up to this date')
 
 
@@ -187,7 +182,7 @@ def plot_eight_windows(plot_dir,
     f.savefig(os.path.join(plot_dir, str(plot_num) + '.png'))
     plt.close()
 
-def save_predictions_to_csv(predictions, targets, test_start, test_end, stride_size, output_file):
+def save_predictions_to_csv(predictions, targets, test_start, test_end, stride_size, output_file, ticker, with_sentiment=False):
     """
     Save prediction results to a CSV file, using original stock data as actual values
     """
@@ -234,11 +229,15 @@ def save_predictions_to_csv(predictions, targets, test_start, test_end, stride_s
     df = df.drop_duplicates(subset='Date', keep='last')
     df = df.sort_values('Date')
     
-    # Load original stock data
-    original_data_path = '../data/stock/goog_stock_wsenti.csv'  # Adjust to your file path
+    # Load original stock data based on ticker
+    if with_sentiment:
+        original_data_path = f'../data/stock/{ticker.lower()}_stock_wsenti.csv'
+    else:
+        original_data_path = f'../data/stock/{ticker.lower()}_stock_data.csv'
+    
     logger.info(f"Loading original stock data: {original_data_path}")
     try:
-        original_data = pd.read_csv('../data/stock/goog_stock_wsenti.csv')
+        original_data = pd.read_csv(original_data_path)
         original_data['Date'] = pd.to_datetime(original_data['Date']).dt.tz_localize(None)
         df['Date'] = df['Date'].dt.tz_localize(None)
         df = pd.merge(df, original_data[['Date', 'Daily Return']], 
@@ -266,7 +265,8 @@ def save_predictions_to_csv(predictions, targets, test_start, test_end, stride_s
             logger.info(f"Evaluation with original data - MAE: {mae:.6f}, RMSE: {rmse:.6f}, Direction Accuracy: {dir_acc:.4f}")
     except Exception as e:
         logger.error(f"Error loading original data: {e}")
-        raise ValueError("Unable to access original stock data. Please ensure the data file path is correct and contains the required columns.")
+        logger.error(f"Looking for file at: {original_data_path}")
+        raise ValueError(f"Unable to access original stock data for {ticker}. Please ensure the data file path is correct and contains the required columns.")
     
     # Date range information
     min_date = df['Date'].min().strftime('%Y-%m-%d')
@@ -287,7 +287,7 @@ def save_predictions_to_csv(predictions, targets, test_start, test_end, stride_s
     # Plot predicted values
     plt.plot(df['Date'], df['prediction'], 'x--', label='Prediction', color='red', alpha=0.7, markersize=3)
     
-    plt.title(f'DeepAR Predictions vs Actual Values ({min_date} to {max_date})')
+    plt.title(f'Stock: DeepAR Predictions vs Actual Values ({min_date} to {max_date})')
     plt.xlabel('Date')
     plt.ylabel('Daily Return')
     plt.legend()
@@ -304,14 +304,34 @@ def save_predictions_to_csv(predictions, targets, test_start, test_end, stride_s
 if __name__ == '__main__':
     # Load the parameters
     args = parser.parse_args()
-    model_dir = os.path.join('experiments', args.model_name) 
+    
+    # Generate dataset and model names based on ticker
+    dataset = f"{args.ticker.lower()}_stock_processed"
+    model_name = f"{args.ticker.lower()}_base_model"
+    
+    # Set up restore file name based on epoch
+    if args.epoch < 0:
+        restore_file = 'best'
+    else:
+        restore_file = f'epoch_{args.epoch}'
+    
+    # Set up paths
+    model_dir = os.path.join('experiments', model_name) 
     json_path = os.path.join(model_dir, 'params.json')
-    data_dir = os.path.join(args.data_folder, args.dataset)
-    assert os.path.isfile(json_path), 'No json configuration file found at {}'.format(json_path)
+    data_dir = os.path.join(args.data_folder, dataset)
+    
+    # Check if model configuration exists
+    assert os.path.isfile(json_path), f'No json configuration file found at {json_path}'
     params = utils.Params(json_path)
 
+    # Set up logging
     utils.set_logger(os.path.join(model_dir, 'deepar-prediction.log'))
+    logger.info(f"Running predictions for ticker: {args.ticker.upper()}")
+    logger.info(f"Using dataset: {dataset}")
+    logger.info(f"Using model: {model_name}")
+    logger.info(f"Restoring from: {restore_file}")
 
+    # Pass arguments to params
     params.relative_metrics = args.relative_metrics
     params.sampling = args.sampling
     params.model_dir = model_dir
@@ -320,24 +340,22 @@ if __name__ == '__main__':
     # Ensure plot directory exists
     os.makedirs(params.plot_dir, exist_ok=True)
     
-    cuda_exist = torch.cuda.is_available()  # use GPU is available
+    # Check CUDA availability
+    cuda_exist = torch.cuda.is_available()
 
-    # Set random seeds for reproducible experiments if necessary
+    # Set up device
     if cuda_exist:
         params.device = torch.device('cuda')
-        # torch.cuda.manual_seed(240)
         logger.info('Using Cuda...')
         model = net.Net(params).cuda()
     else:
         params.device = torch.device('cpu')
-        # torch.manual_seed(230)
         logger.info('Not using cuda...')
         model = net.Net(params)
 
     # Create the input data pipeline
     logger.info('Loading the datasets...')
-
-    test_set = TestDataset(data_dir, args.dataset, params.num_class)
+    test_set = TestDataset(data_dir, dataset, params.num_class)
     test_loader = DataLoader(test_set, batch_size=params.predict_batch, sampler=RandomSampler(test_set), num_workers=4)
     logger.info('- done.')
 
@@ -347,7 +365,7 @@ if __name__ == '__main__':
     logger.info('Starting evaluation')
 
     # Reload weights from the saved file
-    utils.load_checkpoint(os.path.join(model_dir, args.restore_file + '.pth.tar'), model)
+    utils.load_checkpoint(os.path.join(model_dir, restore_file + '.pth.tar'), model)
 
     # Run evaluation
     test_metrics = evaluate(model, loss_fn, test_loader, params, -1, params.sampling)
@@ -357,17 +375,20 @@ if __name__ == '__main__':
     targets = np.array(test_metrics.pop('targets', []))
     
     # Save evaluation metrics (without predictions and target data)
-    save_path = os.path.join(model_dir, 'metrics_test_{}.json'.format(args.restore_file))
+    save_path = os.path.join(model_dir, f'metrics_test_{restore_file}.json')
     utils.save_dict_to_json(test_metrics, save_path)
     
-    # If prediction results need to be saved
-    if args.save_predictions and predictions.size > 0 and targets.size > 0:
+    # Generate predictions file name
+    predictions_file = os.path.join(model_dir, 'deepar_predictions.csv')
+    
+    # If there are predictions to save
+    if predictions.size > 0 and targets.size > 0:
         # Get stride_size
         stride_size = getattr(params, 'stride_size', 5)
         
         # Save prediction results to CSV
-        predictions_file = os.path.join(model_dir, args.predictions_file)
-        save_predictions_to_csv(predictions, targets, args.test_start, args.test_end, stride_size, predictions_file)
+        save_predictions_to_csv(predictions, targets, args.test_start, args.test_end, 
+                                stride_size, predictions_file, args.ticker, args.with_sentiment)
         
         # Output statistics
         logger.info("Prediction generation complete. Summary statistics:")
@@ -392,8 +413,10 @@ if __name__ == '__main__':
             'targets': targets.tolist()
         }
         
-        predictions_json_path = os.path.join(model_dir, 'predictions_data_{}.json'.format(args.restore_file))
+        predictions_json_path = os.path.join(model_dir, f'predictions_data_{restore_file}.json')
         with open(predictions_json_path, 'w') as f:
             json.dump(predictions_data, f)
         
         logger.info(f"Prediction data saved to: {predictions_json_path}")
+    else:
+        logger.error("No predictions generated!")
