@@ -101,7 +101,7 @@ python train.py --ticker <ticker_in_lowercase>
 # Evaluate the model
 python evaluate.py --ticker <ticker_in_lowercase>
 
-# load all epochs' prediction results
+# Load all epochs' prediction results
 ## to run with sentiment data
 python load_model_results.py <ticker_in_lowercase> --with_sentiment
 
@@ -114,6 +114,9 @@ python deepar_prediction.py <ticker_in_lowercase> --with-sentiment --epoch <epoc
 
 ## to run without sentiment data
 python deepar_prediction.py <ticker_in_lowercase> --epoch <epoch_number>
+
+# Using fusion layer to get final prediction
+python fusion_layer.py <ticker_in_lowercase>
 ```
 
 3. Sentiment Analysis

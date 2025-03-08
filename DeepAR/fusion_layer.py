@@ -796,29 +796,73 @@ class FusionLayer:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Fusion Layer for Time Series Prediction')
-    parser.add_argument('--daily', type=str, required=True, help='Path to daily predictions CSV')
-    parser.add_argument('--quarterly', type=str, required=True, help='Path to quarterly data CSV')
+    parser.add_argument('ticker', type=str, help='Stock ticker symbol (e.g., AAPL, MSFT, GOOG)')
     parser.add_argument('--future', type=int, default=0, help='Number of future days to predict')
-    parser.add_argument('--output', type=str, default='fusion_predictions.csv', help='Output file path')
     parser.add_argument('--lookback', type=int, default=7, help='Number of lookback days for features')
     parser.add_argument('--test_size', type=float, default=0.2, help='Proportion of test data')
+    parser.add_argument('--deepar-path', type=str, default=None, 
+                      help='Path to DeepAR directory (default: uses current directory)')
+    parser.add_argument('--data-path', type=str, default=None, 
+                      help='Path to data directory (default: uses DeepAR/../data)')
+    parser.add_argument('--predictions-file', type=str, default=None, 
+                      help='Name of predictions file (default: deepar_predictions.csv)')
+    parser.add_argument('--epoch', type=int, default=None, 
+                      help='Specific epoch for prediction file (e.g., 6 for epoch_6)')
     
     args = parser.parse_args()
+    ticker = args.ticker.lower()
+    if args.deepar_path:
+        deepar_path = args.deepar_path
+    else:
+        deepar_path = os.path.join(os.path.dirname(os.path.abspath(__file__)))
     
-    output_dir = os.path.dirname(args.daily)
-    log_file = os.path.join(output_dir, 'fusion_predictions.log')
-    setup_logging(log_file)
+    if args.data_path:
+        data_path = args.data_path
+    else:
+        data_path = os.path.join(os.path.dirname(deepar_path), 'data')
     
+    model_dir = os.path.join(deepar_path, 'experiments', f'{ticker}_base_model')
+    predictions_file = f'deepar_predictions.csv'
+    
+
+    daily_predictions_path = os.path.join(model_dir, predictions_file)
+    quarterly_data_path = os.path.join(data_path, 'macro_micro', f'{ticker}_quarterly_cdnod.csv')
+    output_file = os.path.join(model_dir, f'fusion_predictions.csv')
+    
+    log_file = os.path.join(model_dir, 'fusion_predictions.log')
+    logger = setup_logging(log_file)
+    
+    logger.info(f"Ticker: {ticker}")
+    logger.info(f"Daily predictions path: {daily_predictions_path}")
+    logger.info(f"Quarterly data path: {quarterly_data_path}")
+    logger.info(f"Output file path: {output_file}")
+    
+    # Create and run fusion model
     fusion = FusionLayer(lookback_days=args.lookback)
     
-    results = fusion.run_pipeline(
-        daily_predictions_path=args.daily,
-        quarterly_data_path=args.quarterly,
-        future_days=args.future if args.future > 0 else None,
-        test_size=args.test_size
-    )
-    
-    output_file = os.path.join(output_dir, args.output)
-    
-    results.to_csv(output_file, index=False)
-    logging.info(f"\nResults have been saved to {output_file}")
+    try:
+        results = fusion.run_pipeline(
+            daily_predictions_path=daily_predictions_path,
+            quarterly_data_path=quarterly_data_path,
+            future_days=args.future if args.future > 0 else None,
+            test_size=args.test_size
+        )
+        
+        # Ensure output directory exists
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
+        
+        # Save results
+        results.to_csv(output_file, index=False)
+        logger.info(f"\nResults have been saved to {output_file}")
+        
+    except FileNotFoundError as e:
+        logger.error(f"Error: File not found - {e}")
+        logger.error("Please check that the necessary files exist at the specified paths:")
+        logger.error(f"DeepAR predictions file: {daily_predictions_path}")
+        logger.error(f"Quarterly data file: {quarterly_data_path}")
+        sys.exit(1)
+    except Exception as e:
+        logger.error(f"Error during fusion model execution: {e}")
+        import traceback
+        logger.error(traceback.format_exc())
+        sys.exit(1)

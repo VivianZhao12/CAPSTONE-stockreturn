@@ -86,3 +86,29 @@ Fusion model average absolute error: 0.014655
 2025-03-06 14:30:49,038 - INFO - Relative improvement: 11.38%
 2025-03-06 14:30:49,041 - INFO - 
 Results have been saved to DeepAR/experiments/goog_base_model/fusion_predictions.csv
+2025-03-08 14:54:54,674 - INFO - Ticker: goog
+2025-03-08 14:54:54,675 - INFO - Daily predictions path: /home/yic075/CAPSTONE-stockreturn/DeepAR/experiments/goog_base_model/deepar_predictions.csv
+2025-03-08 14:54:54,675 - INFO - Quarterly data path: /home/yic075/CAPSTONE-stockreturn/data/macro_micro/goog_quarterly_cdnod.csv
+2025-03-08 14:54:54,675 - INFO - Output file path: /home/yic075/CAPSTONE-stockreturn/DeepAR/experiments/goog_base_model/fusion_predictions.csv
+2025-03-08 14:54:54,675 - INFO - 1. Loading data...
+2025-03-08 14:54:54,683 - INFO - 
+2. Merging quarterly data into daily data...
+2025-03-08 14:54:54,687 - INFO - 
+Data column preview:
+2025-03-08 14:54:54,687 - INFO - - Date
+2025-03-08 14:54:54,687 - INFO - - abs_error
+2025-03-08 14:54:54,687 - INFO - - actual
+2025-03-08 14:54:54,687 - INFO - - error
+2025-03-08 14:54:54,687 - INFO - - prediction
+2025-03-08 14:54:54,687 - INFO - 
+3. Creating fusion features...
+2025-03-08 14:54:54,704 - INFO - 
+4. Training fusion model...
+2025-03-08 14:54:54,918 - INFO - 
+5. Generating final predictions for historical data...
+2025-03-08 14:54:54,931 - INFO - 
+Fusion model average absolute error: 0.014452
+2025-03-08 14:54:54,931 - INFO - DeepAR model average absolute error: 0.016327
+2025-03-08 14:54:54,931 - INFO - Relative improvement: 11.48%
+2025-03-08 14:54:54,935 - INFO - 
+Results have been saved to /home/yic075/CAPSTONE-stockreturn/DeepAR/experiments/goog_base_model/fusion_predictions.csv
