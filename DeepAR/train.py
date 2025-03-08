@@ -21,16 +21,19 @@ import matplotlib.pyplot as plt
 logger = logging.getLogger('DeepAR.Train')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--dataset', default='goog_stock_processed', help='Name of the dataset')
+parser.add_argument('--ticker', required=True, help='Company stock ticker name')
+args, _ = parser.parse_known_args()
+ticker = args.ticker
+
+parser.add_argument('--dataset', default=f'{ticker}_stock_processed', help='Name of the dataset')
 parser.add_argument('--data-folder', default='data', help='Parent dir of the dataset')
-parser.add_argument('--model-name', default='goog_base_model', help='Directory containing params.json')
+parser.add_argument('--model-name', default=f'{ticker}_base_model', help='Directory containing params.json')
 parser.add_argument('--relative-metrics', action='store_true', help='Whether to normalize the metrics by label scales')
 parser.add_argument('--sampling', action='store_true', help='Whether to sample during evaluation')
 parser.add_argument('--save-best', action='store_true', help='Whether to save best ND to param_search.txt')
 parser.add_argument('--restore-file', default=None,
                     help='Optional, name of the file in --model_dir containing weights to reload before \
                     training')  # 'best' or 'epoch_#'
-
 
 def train(model: nn.Module,
           optimizer: optim,
