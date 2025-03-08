@@ -69,6 +69,12 @@ python align_frequency_test.py
 
 # Predict quarterly impact with selected features for each company
 python cdnod/create_df_cdnod.py
+
+* Note we have already pre-selected the fearures based on our resulting graph, for future iterations:
+To select the new feature based on the new graphs:
+1. python cdnod/cdnod_feature_selection.py to automatically select the feature, result would be stored in causal_feature.json under cdnod_graph
+2. Read the resulting casual graph and add more features if not captured
+3. Replace "features" varaibles in "create_df_cdnod.py" with your new features!
 ```
 
 2. DeepAR Model:
