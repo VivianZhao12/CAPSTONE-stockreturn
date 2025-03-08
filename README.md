@@ -47,16 +47,16 @@ pip install -r requirements.txt
 pip install git+https://github.com/py-why/causal-learn.git
 
 # Install Graphviz system package for causal graph visulization
-** For macOS: **
+For macOS:
 brew install graphviz
 
-** For Ubuntu/Debian: **
+For Ubuntu/Debian:
 sudo apt-get install graphviz
 
-** For Windows: **
+For Windows:
 choco install graphviz
 
-** Verify with: **
+Verify with:
 dot -V
 ```
 
