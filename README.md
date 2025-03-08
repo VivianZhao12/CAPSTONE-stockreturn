@@ -117,6 +117,13 @@ python deepar_prediction.py <ticker_in_lowercase> --epoch <epoch_number>
 
 # Using fusion layer to get final prediction
 python fusion_layer.py <ticker_in_lowercase>
+
+# Final prediction visualization
+## to run with sentiment data
+python fusion_visualization.py <ticker_in_lowercase>
+
+## to run without sentiment data
+python fusion_visualization.py <ticker_in_lowercase> --with-sentiment
 ```
 
 3. Sentiment Analysis
