@@ -108,7 +108,7 @@ python data/sentiment/Google_and_CSV_data_sraping.ipynb
 python data/sentiment/Sentiment_score_with_interpolation.ipynb
 ```
 
-### 2. Time Series Modeling with DeepAR
+### 3. Time Series Modeling with DeepAR
 
 ```bash
 cd ../DeepAR
