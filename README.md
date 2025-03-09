@@ -15,8 +15,36 @@ Our integrated approach consists of three primary components:
 ```
 CAPSTONE-stockreturn/
 ├── DeepAR/                    # DeepAR model implementation
+│   ├── data/                  # Processed stock data for model training
+│   │   ├── abt_stock_processed/
+│   │   ├── amgn_stock_processed/
+│   │   ├── amzn_stock_processed/
+│   │   ├── cvs_stock_processed/
+│   │   ├── goog_stock_processed/
+│   │   └── t_stock_processed/
 │   ├── experiments/           # Per-company experimental results
-│   └── README.md              # DeepAR-specific documentation
+│   │   ├── abt_base_model/
+│   │   ├── amgn_base_model/
+│   │   ├── amzn_base_model/
+│   │   ├── cvs_base_model/
+│   │   ├── goog_base_model/
+│   │   ├── param_search/
+│   │   └── t_base_model/
+│   ├── model/                 # Model architecture definitions
+│   │   ├── LSTM.py
+│   │   └── net.py
+│   ├── config.yml             # Configuration settings
+│   ├── dataloader.py          # Data loading utilities
+│   ├── deepar_prediction.py   # Long-term prediction script
+│   ├── evaluate.py            # Model evaluation script
+│   ├── fusion_layer.py        # Fusion model implementation
+│   ├── fusion_visualization.py # Visualization utilities
+│   ├── load_model_results.py  # Results analysis script
+│   ├── pcmci.py               # PCMCI+ feature selection
+│   ├── pcmci_result.log       # Feature selection results
+│   ├── preprocess.py          # Data preprocessing script
+│   ├── train.py               # Model training script
+│   └── utils.py               # Utility functions
 ├── FinBERT/                   # FinBERT sentiment analysis implementation
 ├── data/                      # Data directory
 │   ├── economic/              # Macroeconomic indicators
@@ -26,7 +54,7 @@ CAPSTONE-stockreturn/
 │   └── stock/                 # Historical stock price data
 ├── macro+micro_regression/    # Economic regression analysis
 │   ├── cdnod/                 # CDNOD implementation
-│      ├── cdnod_graph/        # CDNOD graphs and selected features
+│   │   └── cdnod_graph/       # CDNOD graphs and selected features
 └── requirements.txt           # Project dependencies
 ```
 
