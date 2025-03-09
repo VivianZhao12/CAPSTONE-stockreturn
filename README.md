@@ -45,12 +45,11 @@ CAPSTONE-stockreturn/
 │   ├── preprocess.py          # Data preprocessing script
 │   ├── train.py               # Model training script
 │   └── utils.py               # Utility functions
-├── FinBERT/                   # FinBERT sentiment analysis implementation
 ├── data/                      # Data directory
 │   ├── economic/              # Macroeconomic indicators
 │   ├── financial/             # Microeconomic indicators
 │   ├── macro_micro/           # Processed macro and micro data
-│   ├── sentiment/             # Processed sentiment data
+│   ├── sentiment/             # Processed sentiment data and FinBERT sentiment analysis implementation
 │   └── stock/                 # Historical stock price data
 ├── macro+micro_regression/    # Economic regression analysis
 │   ├── cdnod/                 # CDNOD implementation
