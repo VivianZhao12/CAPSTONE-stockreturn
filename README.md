@@ -134,6 +134,7 @@ python cdnod/create_df_cdnod.py
 
 ```bash
 # This part may take a long time to run.
+cd data/sentiment
 python sentiment_data_collection_preprocess.py 
 ```
 
