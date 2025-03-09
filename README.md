@@ -134,6 +134,7 @@ python cdnod/create_df_cdnod.py
 
 ```bash
 # This part may take several hours to run. The data already exists, you may proceed with the rest of the part using the existing data.
+# Please set up your own Reddit API on this platform: https://www.reddit.com/prefs/apps, including: client_id,  client_secret, username, and password.
 cd data/sentiment
 python sentiment_data_collection_preprocess.py 
 ```
