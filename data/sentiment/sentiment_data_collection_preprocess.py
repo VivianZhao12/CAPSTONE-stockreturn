@@ -28,10 +28,10 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 # -------------------------
 reddit = praw.Reddit(
     user_agent=True,
-    client_id="DSPYqJYKgnkPWC1hYN8Cnw",
-    client_secret="2HlMZf-X1PnwsoyfsMvNvwvBGn6FrA",
-    username="Lost-Recognition2843",
-    password="Ihopeyouhaveagreatday1219"
+    client_id= #REPLACE WITH YOUR CLIENT_ID,
+    client_secret= #REPLACE WITH YOUR CLIENT_SECRET,
+    username= #REPLACE WITH YOUR USERNAME,
+    password= #REPLACE WITH YOUR PASSWORD
 )
 
 # ---------------------------------------
