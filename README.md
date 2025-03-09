@@ -124,10 +124,10 @@ python align_frequency_test.py
 python cdnod/create_df_cdnod.py
 ```
 
-**Note**: Pre-selected features based on causal analysis are included. For custom feature selection:
-1. Run `python cdnod/cdnod_feature_selection.py` to generate causal graphs
-2. Review results in `/cdnod_graph/causal_feature.json`
-3. Update feature list in `create_df_cdnod.py` as needed
+**Note**: Pre-selected features based on current causal graph are defined. For updated feature list based on current iteration:
+1. Run `python cdnod/cdnod_feature_selection.py` to automatically capture important features from resulting cdnod graphs
+2. Get selected feature lists in `/cdnod_graph/causal_feature.json` 
+3. Update variable named "feature" in `create_df_cdnod.py` with your new feature list
 
 
 ### 2. Sentiment Analysis
