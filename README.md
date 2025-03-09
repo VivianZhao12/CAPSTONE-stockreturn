@@ -133,6 +133,7 @@ python cdnod/create_df_cdnod.py
 ### 2. Sentiment Analysis
 
 ```bash
+# This part may take a long time to run.
 python sentiment_data_collection_preprocess.py 
 ```
 
