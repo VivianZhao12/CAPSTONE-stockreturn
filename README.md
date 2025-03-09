@@ -133,11 +133,7 @@ python cdnod/create_df_cdnod.py
 ### 2. Sentiment Analysis
 
 ```bash
-# Process Google and CSV data sources:
-python data/sentiment/Google_and_CSV_data_sraping.ipynb
-
-# Generate interpolated sentiment scores:
-python data/sentiment/Sentiment_score_with_interpolation.ipynb
+python sentiment_data_collection_preprocess.py 
 ```
 
 ### 3. Time Series Modeling with DeepAR
