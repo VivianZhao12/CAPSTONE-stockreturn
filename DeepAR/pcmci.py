@@ -58,18 +58,12 @@ def run_pcmci_test(data_frame, features_df, log_file):
     dataframe = pp.DataFrame(data_array, var_names=data.columns, datatime=data.index)
     parcorr_test = parcorr.ParCorr()
     
-    # 创建PCMCI对象并设置verbosity=1来获取详细输出
     pcmci_obj = pcmci.PCMCI(dataframe=dataframe, cond_ind_test=parcorr_test, verbosity=1)
     
-    # 重定向标准输出到文件
     original_stdout = sys.stdout
     with open(log_file, 'w') as f:
         sys.stdout = f
-        
-        # 运行PCMCI+算法
         results = pcmci_obj.run_pcmciplus(tau_min=0, tau_max=5, pc_alpha=0.05)
-        
-        # 打印结果
         print("\nSignificant causal relationships (p < 0.05):")
         for i in range(len(data.columns)):
             for j in range(len(data.columns)):
@@ -78,14 +72,12 @@ def run_pcmci_test(data_frame, features_df, log_file):
                         if results['p_matrix'][i, j, tau] < 0.05:
                             print(f"{data.columns[i]} ->({tau}) {data.columns[j]}: p={results['p_matrix'][i, j, tau]:.4f}")
     
-    # 恢复标准输出
     sys.stdout = original_stdout
     print(f"PCMCI results have been saved to {log_file}")
     
     return results
 
 if __name__ == '__main__':
-    # 设置日志文件路径
     current_dir = os.path.dirname(os.path.abspath(__file__))
     log_file = os.path.join(current_dir, 'pcmci_result.log')
     
@@ -109,7 +101,6 @@ if __name__ == '__main__':
     price_data = data_frame[['Open', 'Close', 'High', 'Low', 'Volume']]
     features_df = generate_all_features(price_data)
     
-    # 运行PCMCI测试并保存结果到文件
     significant_relationships = run_pcmci_test(data_frame, features_df, log_file)
     
     

@@ -1,135 +1,187 @@
-# Causal Discovery in Stock Return
+# Causal Discovery Framework for Stock Return Prediction
 
-This repository contains the implementation of a multi-model framework for stock return prediction that integrates sentiment analysis, historical stock data, and macroeconomic indicators. The project uses DeepAR for time series prediction, FinBERT for sentiment analysis, and Random Forest Regressor for economic indicators.
+This repository implements a comprehensive multi-model framework for stock return prediction that integrates sentiment analysis, historical stock data, and macroeconomic indicators. The framework leverages state-of-the-art methods including DeepAR for time series forecasting, FinBERT for sentiment analysis, and causal discovery techniques for feature selection.
 
+## Framework Overview
 
-## Project Overview
-Our framework combines three main components:
-- Time series prediction using DeepAR and PCMCI
-- Sentiment analysis using FinBERT
-- Economic impact analysis using CDNOD and Random Forest Regressor
+Our integrated approach consists of three primary components:
 
-## Project Structure
-```bash
+1. **Economic Analysis**: Employing CDNOD (Causal Discovery in Non-stationary with Distributional Shifts) and Random Forest regressors to model macroeconomic and microeconomic impacts
+2. **Sentiment Analysis**: Implementing FinBERT to quantify market sentiment
+3. **Time Series Forecasting**: Utilizing DeepAR with PCMCI+ feature selection for causal temporal relationships
+
+## Repository Structure
+
+```
 CAPSTONE-stockreturn/
 ├── DeepAR/                    # DeepAR model implementation
-│   ├── experiments/           # Experiment results for each company
-│   └── README.md              # DeepAR specific documentation
-├── FinBERT/                   # FinBERT implementation
-├── data/                      # Main data directory
-│   ├── economic/              # Macroecomic indicators
-│   ├── financial/             # Microecomic indicators
-│   ├── macro_micro/           # Processed Macro+Micro data
+│   ├── experiments/           # Per-company experimental results
+│   └── README.md              # DeepAR-specific documentation
+├── FinBERT/                   # FinBERT sentiment analysis implementation
+├── data/                      # Data directory
+│   ├── economic/              # Macroeconomic indicators
+│   ├── financial/             # Microeconomic indicators
+│   ├── macro_micro/           # Processed macro and micro data
 │   ├── sentiment/             # Processed sentiment data
-│   └── stock/                 # Historical stock data
-├── macro+micro_regression/    # Macroeconomic and microeconomic regression analysis
+│   └── stock/                 # Historical stock price data
+├── macro+micro_regression/    # Economic regression analysis
 │   ├── cdnod/                 # CDNOD implementation
-|      ├── cdnod_graph/        # CDNOD graphs and selected features
-└── requirements.txt         # Project dependencies
+│      ├── cdnod_graph/        # CDNOD graphs and selected features
+└── requirements.txt           # Project dependencies
 ```
 
-## Setup Instructions
-1. Clone this repository:
-```bash
-git clone https://github.com/VivianZhao12/CAPSTONE-stockreturn.git
-cd CAPSTONE-stockreturn
-```
+## Installation
 
-2. Create and activate a new Python environment (recommended):
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows, use: venv\Scripts\activate
-```
+1. **Clone the Repository**:
+   ```bash
+   git clone https://github.com/VivianZhao12/CAPSTONE-stockreturn.git
+   cd CAPSTONE-stockreturn
+   ```
 
-3. Install the required packages and casaul-learn package:
-```bash
-pip install -r requirements.txt
-pip install git+https://github.com/py-why/causal-learn.git
+2. **Environment Setup**:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-# Install Graphviz system package for causal graph visulization
-For macOS:
-brew install graphviz
+3. **Install Dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   pip install git+https://github.com/py-why/causal-learn.git
+   ```
 
-For Ubuntu/Debian:
-sudo apt-get install graphviz
+4. **Install Graphviz** (required for causal graph visualization):
 
-For Windows:
-choco install graphviz
+   - **macOS**:
+     ```bash
+     brew install graphviz
+     ```
+     
+   - **Ubuntu/Debian**:
+     ```bash
+     sudo apt-get install graphviz
+     ```
+     
+   - **Windows**:
+     ```bash
+     choco install graphviz
+     ```
+     
+   Verify installation:
+   ```bash
+   dot -V
+   ```
 
-Verify with:
-dot -V
-```
+## Implementation Guide
 
+### 1. Economic Causal Analysis
 
-## Data Preparation and Model Training
-1. Economic Impact Analysis
 ```bash
 cd macro+micro_regression/cdnod
 
-# Fetch all data from api and run cdnod
-visit "https://www.alphavantage.co/support/#api-key" and generate your own token, replace api_key = "" with your token in cdnod.py
+# Fetch and process data
+# Note: Obtain API key from "https://www.alphavantage.co/support/#api-key"
+# Replace api_key = "" with your token in cdnod.py
 python cdnod.py
 
-# Align frequency for macro and micro data
+# Align macro and micro data frequencies
 cd ../
 python align_frequency_test.py
 
-# Create data with cdnod selected features
+# Generate dataset with CDNOD-selected features
 python cdnod/create_df_cdnod.py
-
-Note: We have already pre-selected features based on our resulting causal graph.
-For future iterations, follow these steps to select new features:
-1. run "python cdnod/cdnod_feature_selection.py" to automatically select the feature, results are in causal_feature.json under /cdnod_graph
-2. Read the resulting casual graph and add more features if not captured
-3. Modify the "features" variable in create_df_cdnod.py to include your updated feature lists!
 ```
 
-2. DeepAR Model:
+**Note**: Pre-selected features based on causal analysis are included. For custom feature selection:
+1. Run `python cdnod/cdnod_feature_selection.py` to generate causal graphs
+2. Review results in `/cdnod_graph/causal_feature.json`
+3. Update feature list in `create_df_cdnod.py` as needed
+
+
+### 2. Sentiment Analysis
+
 ```bash
-cd ../DeepAR
-
-# Prepare the data
-## to run with sentiment data
-python preprocess.py <ticker_in_lowercase> --with_sentiment
-
-## to run without sentiment data
-python preprocess.py <ticker_in_lowercase>
-
-# Train the model
-python train.py --ticker <ticker_in_lowercase>
-
-# Evaluate the model
-python evaluate.py --ticker <ticker_in_lowercase>
-
-# Load all epochs' prediction results
-## to run with sentiment data
-python load_model_results.py <ticker_in_lowercase> --with_sentiment
-
-## to run without sentiment data
-python load_model_results.py <ticker_in_lowercase>
-
-# Load and save the long term prediction result from human-identified best epoch
-## to run with sentiment data
-python deepar_prediction.py <ticker_in_lowercase> --with-sentiment --epoch <epoch_number>
-
-## to run without sentiment data
-python deepar_prediction.py <ticker_in_lowercase> --epoch <epoch_number>
-
-# Using fusion layer to get final prediction
-python fusion_layer.py <ticker_in_lowercase>
-
-# Final prediction visualization
-## to run with sentiment data
-python fusion_visualization.py <ticker_in_lowercase>
-
-## to run without sentiment data
-python fusion_visualization.py <ticker_in_lowercase> --with-sentiment
-```
-
-3. Sentiment Analysis
-  ```bash
-# Scraping and interpolating data from Google and CSV
+# Process Google and CSV data sources:
 python data/sentiment/Google_and_CSV_data_sraping.ipynb
 
+# Generate interpolated sentiment scores:
 python data/sentiment/Sentiment_score_with_interpolation.ipynb
 ```
+
+### 2. Time Series Modeling with DeepAR
+
+```bash
+cd ../DeepAR
+```
+
+#### Causal Feature Selection:
+```bash
+# Automatic feature selection with PCMCI+
+python pcmci.py
+```
+
+Pre-selected features are included. For custom selection:
+1. Review results in `pcmci_result.log`
+2. Update features in `preprocess.py`'s `gen_covariates` function
+
+#### Model Training Pipeline:
+
+**Data Preparation**:
+```bash
+# With sentiment analysis:
+python preprocess.py <ticker_in_lowercase> --with_sentiment
+
+# Without sentiment analysis:
+python preprocess.py <ticker_in_lowercase>
+```
+
+**Model Training**:
+```bash
+python train.py --ticker <ticker_in_lowercase>
+```
+
+**Model Evaluation**:
+```bash
+python evaluate.py --ticker <ticker_in_lowercase>
+```
+
+**Analyze Model Performance Across Epochs**:
+```bash
+# With sentiment:
+python load_model_results.py <ticker_in_lowercase> --with_sentiment
+
+# Without sentiment:
+python load_model_results.py <ticker_in_lowercase>
+```
+
+**Generate Long-term Predictions**:
+```bash
+# With sentiment:
+python deepar_prediction.py <ticker_in_lowercase> --with-sentiment --epoch <epoch_number>
+
+# Without sentiment:
+python deepar_prediction.py <ticker_in_lowercase> --epoch <epoch_number>
+```
+
+**Fusion Layer for Final Predictions**:
+```bash
+python fusion_layer.py <ticker_in_lowercase>
+```
+
+**Visualization**:
+```bash
+# With sentiment:
+python fusion_visualization.py <ticker_in_lowercase> --with-sentiment
+
+# Without sentiment:
+python fusion_visualization.py <ticker_in_lowercase>
+```
+
+## References
+[1] Huang, A. H., Wang, H., & Yang, Y. (2022). FinBERT: A Large Language Model for Extracting Information from Financial Text. Contemporary Accounting Research, 39(4), 2979-3000. https://doi.org/10.1111/1911-3846.12832
+
+[2] Salinas, D., Flunkert, V., Gasthaus, J., & Januschowski, T. (2020). DeepAR: Probabilistic forecasting with autoregressive recurrent networks. International Journal of Forecasting, 36(3), 1181-1191. https://doi.org/10.1016/j.ijforecast.2019.07.001
+
+[3] Runge, J., Nowack, P., Kretschmer, M., Flaxman, S., & Sejdinovic, D. (2019). Detecting and quantifying causal associations in large nonlinear time series datasets. Science Advances, 5(11), eaau4996. https://doi.org/10.1126/sciadv.aau4996 
+
+[4] Zhang, Y., Jiang, Q., Li, S., Chen, X., Zhang, Y., Wu, X., & Cai, M. (2019). You May Not Need Order in Time Series Forecasting. arXiv preprint arXiv:1910.09620.
