@@ -219,3 +219,4 @@ python fusion_visualization.py <ticker_in_lowercase>
 [5] Biwei Huang, Kun Zhang, Clark Glymour, and Bernhard Schölkopf. Causal discov-
 ery under nonstationary environments. In Proceedings of the 26th international joint
 conference on artificial intelligence (IJCAI), pages 1347–1353, 2017
+https://www.ijcai.org/proceedings/2017/0187.pdf
