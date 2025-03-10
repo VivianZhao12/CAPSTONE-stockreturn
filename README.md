@@ -215,3 +215,7 @@ python fusion_visualization.py <ticker_in_lowercase>
 [3] Runge, J., Nowack, P., Kretschmer, M., Flaxman, S., & Sejdinovic, D. (2019). Detecting and quantifying causal associations in large nonlinear time series datasets. Science Advances, 5(11), eaau4996. https://doi.org/10.1126/sciadv.aau4996 
 
 [4] Zhang, Y., Jiang, Q., Li, S., Jin, X., Ma, X., & Yan, X. (2019). You May Not Need Order in Time Series Forecasting. arXiv preprint arXiv:1910.09620. https://doi.org/10.48550/arXiv.1910.09620
+
+[5] Biwei Huang, Kun Zhang, Clark Glymour, and Bernhard Schölkopf. Causal discov-
+ery under nonstationary environments. In Proceedings of the 26th international joint
+conference on artificial intelligence (IJCAI), pages 1347–1353, 2017
